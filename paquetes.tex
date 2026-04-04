@@ -18,5 +18,23 @@
 \usepackage{subcaption}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{eso-pic}
+%\usepackage{siunitx}
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta}
 \graphicspath{ {./Imagenes/} }
+\usepackage[pages=some]{background} % 'some' para especificar páginas
+
+\backgroundsetup{
+    scale=0.6,       % Tamaño de la garza (ajusta según necesites)
+    color=black!5,   % Tenacidad/Transparencia (5% de negro es muy claro)
+    opacity=0.08,     % Transparencia (0.0 a 1.0)
+    angle=0,         % Ángulo de rotación
+    contents={\includegraphics{Imagenes/garza_uaeh.png}} % Nombre de tu imagen
+}
+
+\lstset{
+    breaklines=true,         % ESTO arregla el texto que se sale
+    breakatwhitespace=true,
+    basicstyle=\ttfamily\small,
+    columns=flexible
+}
