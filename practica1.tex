@@ -1,0 +1,102 @@
+\section{Practica 1: Cuatro Leds}
+
+\subsection{Introducción}
+\noindent	
+	Esta práctica tratará de encender cuatro focos LED, usando una PIC16F628A, una protoboard, cuatro resistencias y  cuatro focos LED. Es una práctica introductoria que tiene como finalidad presentar el uso más básico y elemental del PIC16F628A. Un PIC es un circuito integrado programable (Programmable Integrated Circuit), el cual contiene todos los componentes para poder realizar y controlar una tarea, por lo que se denomina como un microcontrolador.
+
+\subsection{Materiales}
+	\begin{itemize}
+		\item Microcontrolador PIC16F628A.
+		\item 1 Protoboard
+		\item Cristal de cuarzo 4MHz (Oscilador XT).
+		\item 4 Resistencias de 220 \ohm (para los LEDs).
+		\item 4 LEDs individuales.
+		\item Fuente de alimentación de 5V DC
+		\item 2 capacitores 22pF
+		\item Cables
+	\end{itemize}
+
+\subsection{Software}
+	\begin{itemize}
+		\item Proteus 8.0
+		\item MPLAB X IDE
+		\item PICkit 3 Programmer App and Scripting Tool v3.10
+	\end{itemize}
+
+\subsection{Circuito}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width = 0.8 \textwidth]{PROY_01.png}
+		\caption{Circuito exportado de Proteus}
+		\label{fig:proy01}
+	\end{figure}
+
+\subsection{Desarrollo}
+\noindent
+	Empezamos esta práctica haciendo el diagrama en proteus (Figura \ref{fig:proy01}), para posteriorment	e, en el software de MPLAB, en código C, hacer el programa .hex, el cual probamos en una 	simulación en proteus.\\
+Una vez hecho esto, procedimos a conectar en nuestro Protoboard los materiales necesario	s.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width = 0.8 \textwidth]{.png}
+		\caption{Conexion de componentes}
+		\label{fig:concomponentes}
+	\end{figure}
+\noindent	
+	Programamos el PIC16F628A con ayuda de nuestro PicKit 3, y lo conectamos a nuestro protoboard.
+
+	%aqui va otra figura
+\noindent	
+	Este fue nuestro primer intento, y no prendió, nos dimos cuenta de que estaba mal conectado en el puenteo.
+
+	%otra figura
+\noindent	
+	Ya al corregir todo volvimos a probar, y ya nos salió.
+
+	%otra figura
+
+\subsection{Codigo en C}
+	\begin{verbatim}
+		#pragma config FOSC = XT        // Oscillator Selection bits (XT oscillator: Crystal/resonator on RA6/OSC2/CLKOUT and RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = ON       // Power-up Timer Enable bit (PWRT enabled)
+#pragma config MCLRE = ON       // RA5/MCLR/VPP Pin Function Select bit (RA5/MCLR/VPP pin function is MCLR)
+#pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit (RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming)
+#pragma config CPD = OFF        // Data EE Memory Code Protection bit (Data memory code protection off)
+#pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
+
+// #pragma config statements should precede project file includes.
+// Use project enums instead of #define for ON and OFF.
+
+#include <xc.h>
+void main(void) {
+    TRISA = 0b11111;
+    TRISB = 0b10101010;
+    
+    PORTA = 0x0;
+    PORTB = 0x0;
+    
+    while(1){
+        PORTB = 0b1010101;
+    }
+    return;
+}
+
+	\end{verbatim}
+
+\subsection{Circuito cuando se ejecuta la simulacion}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width = 0.8 \textwidth]{PROY_01_sim.png}
+		\caption{Circuito exportado de Proteus}
+		\label{fig:proy01sim}
+	\end{figure}
+
+\subsection{Conclusion}
+\noindent	
+	En esta práctica se logró implementar correctamente el encendido de cuatro LEDs mediante el uso de un microcontrolador PIC16F628A, integrando tanto la programación en lenguaje C como el armado del circuito en protoboard. A través de este ejercicio se comprendió la importancia de la configuración de los puertos de entrada y salida, así como el control digital de señales para manipular dispositivos electrónicos básicos.
+
+\noindent	
+Además, se reforzaron habilidades en la interpretación de diagramas eléctricos y en la correcta conexión de componentes, evitando errores comunes como cortocircuitos o conexiones incorrectas. La programación permitió establecer una lógica de control sobre los LEDs, demostrando cómo el software interactúa directamente con el hardware.
+
