@@ -22,19 +22,13 @@
 %\usepackage{siunitx}
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta}
 \graphicspath{ {./Imagenes/} }
-\usepackage[pages=some]{background} % 'some' para especificar páginas
-
-\backgroundsetup{
-    scale=0.6,       % Tamaño de la garza (ajusta según necesites)
-    color=black!5,   % Tenacidad/Transparencia (5% de negro es muy claro)
-    opacity=0.08,     % Transparencia (0.0 a 1.0)
-    angle=0,         % Ángulo de rotación
-    contents={\includegraphics{Imagenes/garza_uaeh.png}} % Nombre de tu imagen
-}
+\usepackage[pages=some]{background}
 
 \lstset{
-    breaklines=true,         % ESTO arregla el texto que se sale
-    breakatwhitespace=true,
-    basicstyle=\ttfamily\small,
-    columns=flexible
+    basicstyle=\ttfamily\scriptsize, % Bajamos de small a scriptsize por lo largo de los #pragma
+    breaklines=true,                 % Activa el quiebre de línea
+    breakatwhitespace=false,         % Cambia a false para que rompa incluso si no hay espacios
+    columns=fullflexible,            % Ayuda a que el espaciado sea más natural
+    keepspaces=true,                 % Mantiene los espacios del código original
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 % Para que acepte acentos en comentarios
 }
