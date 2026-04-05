@@ -1,0 +1,141 @@
+\section{Practica 4: Semaforo de crucero}
+
+\subsection{Introduccion}
+\noindent
+En esta práctica se llevará a cabo el armado de un circuito que simula un semaforo de crucero (dos semáforos para control de tráfico), este debe tener un tiempo para dar paso (color verde) mientras el otro semáforo marca alto (color rojo) después el semáforo que se encuentra en paso debe dar la señal de precaución para el cambio de estado (de paso a alto, parpadeo de color ambar/amarillo) y por ultimo cambiar el estado de los semaforos, es decir el de paso ahora se encontrara en alto y el que se encontraba en alto ahora sera paso, y este proceso se repetira de forma indefinida.
+
+\subsection{Materiales}
+\begin{itemize}
+	\item PIC16F628A
+	\item Fuente de poder
+	\item Protoboard
+	\item Cristal de cuarzo de $4MHz$
+	\item 2 capacitores de 22$pF$
+	\item 6 resistemcias de $220\Omega$
+	\item 2 leds verdes
+	\item 2 leds amarillos/ambar
+	\item 2 leds rojos
+	\item Jumpers macho-macho(o cable)
+	\item PICkit3
+\end{itemize}
+
+\subsection{Software}
+\begin{itemize}
+	\item MPLAB X IDE
+	\item Proteus 8 Profesional
+	\item PICkit3 Programmer App and Scripting Tool v3.10
+	\end{itemize}
+
+\subsection{Circuito}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 1 \textwidth]{PROY_04.png}
+	\caption{Circuito exportado de Proteus}
+	\label{fig:proy04}
+\end{figure}
+
+\subsection{Desarrollo}
+\noindent
+En el software Proteus se realizó la simulación de la práctica, en primer lugar se hizo la construcción del circuito que posteriormente se armará en físico (Figura \ref{fig:proy4}). Para simular la función de los semáforos en el software MPLAB X IDE se escribió el código correspondiente, a continuación en Proteus se exportó el archivo .hex del programa mencionado anteriormente y se ejecutó la simulación para comprobar el correcto funcionamiento del programa y del circuito (Figura \ref{fig:proy04sim}).
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.8 \textwidth]{PROY_04_sim.png}
+	\caption{Circuito ejecutando la simulacion en Proteus}
+	\label{fig:proy04sim}
+\end{figure}
+
+\noindent
+Posteriormente se procedió al armado del circuito de forma física de forma consistente con el circuito que simulamos en Proteus y con el PICkit3 y su software se programó el PIC16F628A, notemos que el circuito empieza en un estado de paso para un semáforo y para el otro semáforo inicia en el estado de alto (Figura \ref{fig:semaforo1}) posteriormente el semáforo que se encuentra en paso comienza a parpadear el led ámbar (Figura \ref{fig:semaforo2}) que indica la precaución para el cambio de estados y posterior a esto, los semáforos cambia su estado y se repite este proceso indefinidamente tal y como se quería.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{semaforo1.jpeg}
+        \caption{Semaforos en estados contrarios}
+        \label{fig:semaforo1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{semaforo2.jpeg}
+        \caption{Semaforo parpadeando}
+        \label{fig:semaforo2}
+    \end{minipage}
+\end{figure}
+\newpage
+
+\subsection{Codigo en C}
+\begin{verbatim}
+
+/*
+ * File:   SEMAFORO.c
+ * Author: jesus
+ *
+ * Created on 19 de marzo de 2026, 6:47 a.m.
+ */
+// 'C' source line config statements
+
+// CONFIG
+#pragma config FOSC = XT        // Oscillator Selection bits 
+(XT oscillator: Crystal/resonator on RA6/OSC2/CLKOUT and RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = ON       // Power-up Timer Enable bit (PWRT enabled)
+#pragma config MCLRE = ON       // RA5/MCLR/VPP Pin Function Select bit 
+(RA5/MCLR/VPP pin function is MCLR)
+#pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit 
+(RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming)
+#pragma config CPD = OFF        // Data EE Memory Code Protection bit 
+(Data memory code protection off)
+#pragma config CP = OFF         // Flash Program Memory Code Protection bit 
+(Code protection off)
+
+// #pragma config statements should precede project file includes.
+// Use project enums instead of #define for ON and OFF.
+
+#include <xc.h>
+#define _XTAL_FREQ 4000000 //Definimos la frecuencia del cristal
+void config(){ //Configuramos los bits de entrada y salida
+    TRISA = 0xF8;
+    TRISB = 0xF8;
+   
+    PORTA = 0x00;
+    PORTB = 0x00;
+}
+
+
+void main(void) {
+    config();
+   
+    while(1){  //ciclo para que se lleve a cabo el proceso
+        PORTA = 0x04; // un semáforo en verde otro en rojo
+        PORTB = 0x01;
+        __delay_ms(400);
+       
+        for(int i = 0; i < 5; i++){ //parpadeo del led ambar
+            PORTA = 0x04;
+            __delay_ms(200);
+            PORTA = 0x06;
+            __delay_ms(200);
+        }
+       
+        PORTA = 0x01; //un semáforo en rojo otro en verde
+        PORTB = 0x04;
+        __delay_ms(400);
+       
+        for(int j = 0; j < 5; j++){ //parpadeo del led ambar
+            PORTB = 0x04;
+            __delay_ms(200);
+            PORTB = 0x06;
+            __delay_ms(200);
+        }
+    }
+    return;
+}
+\end{verbatim}
+
+\subsection{Conclusion}
+\noindent
+El circuito funcionó de forma adecuada, es decir el circuito no tuvo fallos al concluir el ensamblado correcto y el programa realizó exactamente la simulación de un semáforo de crucero, en esta práctica se comprendió mejor el uso de los puertos de entrada y salida, así como una aplicación más práctica de la utilidad de los microprocesadores.
