@@ -1,0 +1,110 @@
+\section{Practica 6: Contador}
+
+\subsection{Introducción}
+En esta práctica se programó el PIC16F628A con el objetivo de que sea un contador desde el número 1 al 99 usando 2 decodificadores uno para el puerto A y el otro para el puerto B.
+
+\subsection{Materiales}
+\noindent
+Para la realización de esta práctica utilizamos los siguientes materiales y herramientas:
+\begin{itemize}
+	\item Microcontrolador PIC16F628A
+	\item Display de 7 segmentos
+	\item Resistencias
+	\item Cristal de 4MHz
+	\item Protoboard
+	\item Cables de conexión
+	\item 2 Decodificadores
+	\item Fuente de alimentación
+\end{itemize}
+
+\subsection{Software}
+\begin{itemize}
+	\item Proteus 8.0
+	\item MPLAB X IDE
+	\item PICkit 3 Programmer App and Scripting Tool v3.10
+\end{itemize}
+
+\subsection{Circuito}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.8 \textwidth]{PROY_06.png}
+	\caption{Circuito exportado de Proteus}
+	\label{fig:proy05}
+\end{figure}
+
+\subsection{Desarrollo}
+\noindent
+Se observa el microcontrolador PIC16F628A colocado en la protoboard. Se conectan  el cristal de 4 MHz con sus capacitores en los pines , y la resistencia . Esto establece la base para que el microcontrolador funcione a la frecuencia configurada de 4 MHz.
+
+\noindent
+Se incorporan dos displays de siete segmentos de ánodo común (7SEG-COM-AN-GRN). Estos son controlados mediante los decodificadores 7447 y 7448
+
+\noindent
+Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodificadores 7447 y 7448. Desde estos, se conectan a los displays de siete segmentos. 
+
+\noindent
+La imagen muestra el sistema ya energizado. Los dos displays de siete segmentos están encendidos y muestran una secuencia numérica que cambia cada 500 ms, contando de 01 a 99.
+
+\subsection{Codigo en C}
+\begin{verbatim}
+/*
+ * File:   CONTADOR.c
+ * Author: jesus
+ *
+ * Created on 17 de marzo de 2026, 10:51 a.m.
+ */
+// PIC16F628A Configuration Bit Settings
+
+// 'C' source line config statements
+
+// CONFIG
+#pragma config FOSC = XT        // Oscillator Selection bits 
+(XT oscillator: Crystal/resonator on RA6/OSC2/CLKOUT and RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF        // Watchdog Timer Enable bit (WDT enabled)
+#pragma config PWRTE = ON       // Power-up Timer Enable bit (PWRT enabled)
+#pragma config MCLRE = ON       // RA5/MCLR/VPP Pin Function Select bit 
+(RA5/MCLR/VPP pin function is MCLR)
+#pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit 
+(RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming)
+#pragma config CPD = OFF        // Data EE Memory Code Protection bit 
+(Data memory code protection off)
+#pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
+
+// #pragma config statements should precede project file includes.
+// Use project enums instead of #define for ON and OFF.
+
+#include <xc.h>
+#define _XTAL_FREQ 4000000
+//para anodo
+unsigned char numerosA[10] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+unsigned char numerosB[10] = {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90};
+//unsigned char numeros[16] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+
+void main(void) {
+    TRISA = 0X00;
+    TRISB = 0X00;
+    
+    for(int i = 0; i < 10; i++){
+        PORTA = numerosA[i];//decenas
+        PORTB = 0x00;
+        for(int j = 0; j < 10; j++){
+            PORTB = numerosB[j];//unidades
+            __delay_ms(100);
+        }
+    }
+    return;
+}
+\end{verbatim}
+
+\subsection{Circuito cuando se ejecuta en Proteus}
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.8 \textwidth]{PROY_06_sim.png}
+	\caption{Simulación en Proteus}
+	\label{fig:proy06sim}
+\end{figure}
+
+\subsection{Consclusiones}
+\noindent
+Durante el desarrollo de esta práctica aprendimos a usar decodificadores correctamente a falta de un segundo PIC; a su vez, vamos aprendiendo más sobre electrónica. Lo cual se notó ya que el circuito nos prendió al primer intento.
