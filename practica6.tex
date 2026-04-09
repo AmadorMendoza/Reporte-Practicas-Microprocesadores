@@ -1,6 +1,7 @@
 \section{Practica 6: Contador}
 
 \subsection{Introducción}
+\noindent
 En esta práctica se programó el PIC16F628A con el objetivo de que sea un contador desde el número 1 al 99 usando 2 decodificadores uno para el puerto A y el otro para el puerto B.
 
 \subsection{Materiales}
@@ -34,16 +35,42 @@ Para la realización de esta práctica utilizamos los siguientes materiales y he
 
 \subsection{Desarrollo}
 \noindent
-Se observa el microcontrolador PIC16F628A colocado en la protoboard. Se conectan  el cristal de 4 MHz con sus capacitores en los pines , y la resistencia . Esto establece la base para que el microcontrolador funcione a la frecuencia configurada de 4 MHz.
+Se observa el microcontrolador PIC16F628A colocado en la protoboard. Se conectan  el cristal de 4 MHz con sus capacitores en los pines , y la resistencia . Esto establece la base para que el microcontrolador funcione a la frecuencia configurada de 4 MHz (Figura \ref{conexmicro}).
+
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{conex_micro.png}
+	\caption{Conexión del Microcontrolador}
+	\label{fig:conexmicro}
+\end{figure}
 
 \noindent
-Se incorporan dos displays de siete segmentos de ánodo común (7SEG-COM-AN-GRN). Estos son controlados mediante los decodificadores 7447 y 7448
+Se incorporan dos displays de siete segmentos de ánodo común (7SEG-COM-AN-GRN). Estos son controlados mediante los decodificadores 7447 y 7448 (Figura \ref{instaldisplay}).
+
+\begin{figire}
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{instal_display.png}
+	\caption{Instalación de los displays de 7 Segmentos}
+	\label{fig:instaldisplay}
+\end{figure}
 
 \noindent
-Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodificadores 7447 y 7448. Desde estos, se conectan a los displays de siete segmentos. 
+Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodificadores 7447 y 7448. Desde estos, se conectan a los displays de siete segmentos (Figura \ref{cableadoprac06}).
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{cableado_prac06.png}
+	\caption{Cableado de puertos a displays y colocación de capacitores}
+	\label{fig:cableadoprac06}
+\end{figure}
 
 \noindent
-La imagen muestra el sistema ya energizado. Los dos displays de siete segmentos están encendidos y muestran una secuencia numérica que cambia cada 500 ms, contando de 01 a 99.
+La imagen muestra el sistema ya energizado (Figura \ref{funciona06}). Los dos displays de siete segmentos están encendidos y muestran una secuencia numérica que cambia cada 500 ms, contando de 01 a 99.
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{funciona_06.png}
+	\caption{Prototipo en funcionamiento}
+	\label{fig:funciona06}
+\end{figure}
 
 \subsection{Codigo en C}
 \begin{verbatim}
@@ -98,7 +125,7 @@ void main(void) {
 \end{verbatim}
 
 \subsection{Circuito cuando se ejecuta en Proteus}
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width = 0.8 \textwidth]{PROY_06_sim.png}
 	\caption{Simulación en Proteus}
