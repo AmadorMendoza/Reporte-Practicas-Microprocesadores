@@ -1,0 +1,201 @@
+\section{Practica 3: LEDs en cascada}
+
+\subsection{Introducción}
+\noindent
+En esta práctica, se colocaron 24 leds en 8 filas de 3 leds cada una en una protoboard; el objetivo es que los 24 leds formarán 3 secuencias distintas; la primera era que cada fila se apagará y prendiera empezando por las filas de los extremos (0 y 7), terminando en las filas del centro (3 y 4) y luego de regreso, la segunda secuencia era que empezaran a prenderse y apagarse una fila por una, empezando en la fila 0 y terminando en la fila 7, por último, la tercera secuencia inicia con la fila 0 encendiéndose, luego la fila 1 pero sin apagarse la fila 0 y así sucesivamente hasta que todas las filas estén encendidas.
+
+\subsection{Materiales}
+\begin{itemize}
+	\item PIC16F628A
+	\item 8 resistencias de 220$\Omega$
+	\item Alambre para Protoboard
+	\item 1 Cristal de cuarzo de 4MHz
+	\item 2 Capacitores de 22pf
+	\item Fuente de poder
+\end{itemize}
+
+\subsection{Software}
+\begin{itemize}
+	\item Proteus 8.0
+	\item MPLAB X IDE
+	\item PICkit 3 Programmer App and Scripting Tool v3.10
+\end{itemize}
+
+\subsection{Circuito}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.8 \textwidth]{PROY_03.png}
+	\caption{Circuito esportado de Proteus}
+	\label{fig:proy03}
+\end{figure}
+
+\subsection{Desarrollo}
+\noindent
+Comenzamos grabando el pic con el archivo .hex (previamente probado en la simulación de proteus) haciendo uso de nuestro aparato Pickit3, entonces basándonos en el circuito hecho en Proteus procedimos a montarlo en la protoboard; sin embargo, nos percatamos que este mismo no prendio a la primera por lo que fue necesario checar las conexiones (Figura \ref{fig:conex03}) y procedimos a volver a acomodar los leds y los alambres de la protoboard para que el circuito se viera más ordenado y asegurarnos de que todo estuviera en orden (Figura \ref{fig:leds03} y Figura \ref{fig:circuitterminado03}).
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{conex_03.png}
+	\caption{Revisando las conexiones}
+	\label{fig:conex03}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{leds_03}
+	\caption{Acomodando los leds en la protoboard}
+	\label{fig:leds03}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{reacomodo_03.png}
+	\caption{Re-acomodando los leds en la protoboard}
+\end{figure}
+
+\noindent
+Después procedimos a terminar el armado y verificar nuevamente que todo estuviera en su lugar, descubriendo que el error cometido anteriormente fue que habían alambres mal conectados, mismo error que fue corregido más adelante.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{circuito_terminado_03.png}
+	\caption{Ciruito terminado}
+	\label{fig:circuitterminado103}
+\end{figure}
+
+\noindent
+Una vez corregidos los errores procedimos a probar el circuito haciendo uso de nuestra fuente de poder, el resultado fue satisfactorio pues las secuencias programadas se concretaron como estaban programadas.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{circuito_funcionando1_03.png}
+	\caption{Ciruito en funcionamiento}
+	\label{fig:circuitfun03}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{circuito_funcionando2_03.png}
+	\caption{Ciruito terminado}
+	\label{fig:circuitterminado203}
+\end{figure}
+\clearpage
+
+\subsection{Codigo en C}
+\begin{verbatim}
+// PIC16F628A Configuration Bit Settings
+
+// 'C' source line config statements
+
+// CONFIG
+#pragma config FOSC = XT        // Oscillator Selection bits 
+//(XT oscillator: Crystal/resonator on RA6/OSC2/CLKOUT and RA7/OSC1/CLKIN)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = ON       // Power-up Timer Enable bit (PWRT enabled)
+#pragma config MCLRE = ON       // RA5/MCLR/VPP Pin Function Select bit 
+//(RA5/MCLR/VPP pin function is MCLR)
+#pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit 
+//(RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming)
+#pragma config CPD = OFF        // Data EE Memory Code Protection bit 
+//(Data memory code protection off)
+#pragma config CP = OFF         // Flash Program Memory Code Protection bit 
+//(Code protection off)
+
+// Use project enums instead of #define for ON and OFF.
+
+#include <xc.h> // Librería principal del microcontrolador
+#define _XTAL_FREQ 4000000 // Frecuencia del cristal = 4 MHz 
+
+// Arreglos para cada secuencia
+
+unsigned char secuencia12[8] = {0x01,0x02,0x04,0x08,
+				0x02,0x08,0x20,0x80}; // Secuencias 1 y 2 
+unsigned char secuencia3[8] = {0x01,0x03,0x07,0x0F,
+				0x02,0x0A,0x2A,0xAA}; // Secuencia 3
+
+void main (void){
+
+TRISA = 0b11100000; // RA0–RA4 como salidas, RA5–RA7 como entradas
+TRISB = 0b00000000; // Todo PORTB como salida
+ 
+// Limpieza de los puertos
+PORTA = 0x00; 
+PORTB = 0x00; 
+
+while(1){ 
+
+//Secuencia 1
+
+// Empieza de afuera hacia adentro
+for(int i = 0; i<4; i++){ 
+PORTA = secuencia12[i]; 
+PORTB = secuencia12[7-i]; 
+__delay_ms(400); 
+
+}
+
+// De adentro hacia afuera
+for(int i = 2; i>=0; i--){ 
+PORTA = secuencia12[i]; 
+PORTB = secuencia12[7-i]; 
+__delay_ms(400); 
+
+}
+
+// Limpieza de los puertos 
+PORTA = 0x00; 
+PORTB = 0x00; 
+__delay_ms(400); 
+
+
+// Secuencia 2
+
+// Los leds prenden en orden
+for(int i = 0; i<4; i++){ 
+PORTA = secuencia12[i]; 
+PORTB = 0x00; 
+__delay_ms(400);
+}
+
+for(int i = 4; i<8; i++){ 
+PORTA = 0x00; 
+PORTB = secuencia12[i]; 
+__delay_ms(400);
+}
+
+// Limpieza de los puertos 
+PORTA = 0x00; 
+PORTB = 0x00;
+__delay_ms(400);
+
+
+// Secuencia 3
+
+// Se prenden los leds del puerto A
+for(int i = 0; i<4; i++){ 
+PORTA = secuencia3[i]; 
+PORTB = 0x00; 
+__delay_ms(400);
+}
+
+// Se prenden los leds del puerto B sin apagar los del puerto A
+for(int i = 4; i<8; i++){ 
+PORTA = 0x0F; 
+PORTB = secuencia3[i]; 
+__delay_ms(400);
+}
+
+\end{verbatim}
+
+\subsection{Circuito cuando se ejecuta la simulación}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5 \textwidth]{PROY_03_sim.png}
+	\caption{Ciruito exportado de Proteus}
+	\label{fig:proy03sim}
+\end{figure}
+
+\subsection{Conclusiones}
+\noindent
+Logramos desarrollar y programar tres secuencias de LEDs usando el PIC16F628A, 2 arreglos (uno para las secuencias 1 y 2, el otro para la secuencia 3) y ciclos for, lo cual ayudó a organizar mejor el código. También se reforzó el uso del simulador para verificar el funcionamiento del programa antes de implementarlo físicamente, pues en la simulación en proteus el programa funcionó bien y las secuencias de LEDs se ejecutaron sin errores, pero en el circuito no se logró el funcionamiento correcto al primer intento, por lo que tuvimos revisar cuidadosamente las conexiones y cambiar algunas conexiones. 
