@@ -36,7 +36,12 @@ En esta práctica se llevará a cabo el armado de un circuito que simula un sema
 
 \subsection{Desarrollo}
 \noindent
-En el software Proteus se realizó la simulación de la práctica, en primer lugar se hizo la construcción del circuito que posteriormente se armará en físico (Figura \ref{fig:proy4}). Para simular la función de los semáforos en el software MPLAB X IDE se escribió el código correspondiente, a continuación en Proteus se exportó el archivo .hex del programa mencionado anteriormente y se ejecutó la simulación para comprobar el correcto funcionamiento del programa y del circuito (Figura \ref{fig:proy04sim}).
+En el software Proteus se realizó la simulación de la práctica, en primer lugar se hizo 
+la construcción del circuito que posteriormente se armará en físico (Figura \ref{fig:proy4}). 
+Para simular la función de los semáforos en el software MPLAB X IDE se escribió el código 
+correspondiente, a continuación en Proteus se exportó el archivo .hex del programa 
+mencionado anteriormente y se ejecutó la simulación para comprobar el correcto 
+funcionamiento del programa y del circuito (Figura \ref{fig:proy04sim}).
 
 \begin{figure}[ht]
 	\centering
@@ -46,7 +51,14 @@ En el software Proteus se realizó la simulación de la práctica, en primer lug
 \end{figure}
 
 \noindent
-Posteriormente se procedió al armado del circuito de forma física de forma consistente con el circuito que simulamos en Proteus y con el PICkit3 y su software se programó el PIC16F628A, notemos que el circuito empieza en un estado de paso para un semáforo y para el otro semáforo inicia en el estado de alto (Figura \ref{fig:semaforo1}) posteriormente el semáforo que se encuentra en paso comienza a parpadear el led ámbar (Figura \ref{fig:semaforo2}) que indica la precaución para el cambio de estados y posterior a esto, los semáforos cambia su estado y se repite este proceso indefinidamente tal y como se quería.
+Posteriormente se procedió al armado del circuito de forma física de forma consistente 
+con el circuito que simulamos en Proteus y con el PICkit3 y su software se programó el 
+PIC16F628A, notemos que el circuito empieza en un estado de paso para un semáforo y 
+para el otro semáforo inicia en el estado de alto (Figura \ref{fig:semaforo1}) 
+posteriormente el semáforo que se encuentra en paso comienza a parpadear el led ámbar 
+(Figura \ref{fig:semaforo2}) que indica la precaución para el cambio de estados y 
+posterior a esto, los semáforos cambia su estado y se repite este proceso 
+indefinidamente tal y como se quería.
 
 \begin{figure}[H]
     \centering

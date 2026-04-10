@@ -2,7 +2,13 @@
 
 \subsection{Introducción}
 \noindent
-En esta práctica, se colocaron 24 leds en 8 filas de 3 leds cada una en una protoboard; el objetivo es que los 24 leds formarán 3 secuencias distintas; la primera era que cada fila se apagará y prendiera empezando por las filas de los extremos (0 y 7), terminando en las filas del centro (3 y 4) y luego de regreso, la segunda secuencia era que empezaran a prenderse y apagarse una fila por una, empezando en la fila 0 y terminando en la fila 7, por último, la tercera secuencia inicia con la fila 0 encendiéndose, luego la fila 1 pero sin apagarse la fila 0 y así sucesivamente hasta que todas las filas estén encendidas.
+En esta práctica, se colocaron 24 leds en 8 filas de 3 leds cada una en una protoboard; 
+el objetivo es que los 24 leds formarán 3 secuencias distintas; la primera era que cada 
+fila se apagará y prendiera empezando por las filas de los extremos (0 y 7), terminando 
+en las filas del centro (3 y 4) y luego de regreso, la segunda secuencia era que empezaran 
+a prenderse y apagarse una fila por una, empezando en la fila 0 y terminando en la fila 
+7, por último, la tercera secuencia inicia con la fila 0 encendiéndose, luego la fila 1 
+pero sin apagarse la fila 0 y así sucesivamente hasta que todas las filas estén encendidas.
 
 \subsection{Materiales}
 \begin{itemize}
@@ -31,7 +37,13 @@ En esta práctica, se colocaron 24 leds en 8 filas de 3 leds cada una en una pro
 
 \subsection{Desarrollo}
 \noindent
-Comenzamos grabando el pic con el archivo .hex (previamente probado en la simulación de proteus) haciendo uso de nuestro aparato Pickit3, entonces basándonos en el circuito hecho en Proteus procedimos a montarlo en la protoboard; sin embargo, nos percatamos que este mismo no prendio a la primera por lo que fue necesario checar las conexiones (Figura \ref{fig:conex03}) y procedimos a volver a acomodar los leds y los alambres de la protoboard para que el circuito se viera más ordenado y asegurarnos de que todo estuviera en orden (Figura \ref{fig:leds03} y Figura \ref{fig:circuitterminado03}).
+Comenzamos grabando el pic con el archivo .hex (previamente probado en la simulación de 
+proteus) haciendo uso de nuestro aparato Pickit3, entonces basándonos en el circuito 
+hecho en Proteus procedimos a montarlo en la protoboard; sin embargo, nos percatamos que 
+este mismo no prendio a la primera por lo que fue necesario checar las conexiones 
+(Figura \ref{fig:conex03}) y procedimos a volver a acomodar los leds y los alambres de 
+la protoboard para que el circuito se viera más ordenado y asegurarnos de que todo 
+estuviera en orden (Figura \ref{fig:leds03} y Figura \ref{fig:circuitterminado03}).
 
 \begin{figure}[ht]
 	\centering
@@ -54,7 +66,9 @@ Comenzamos grabando el pic con el archivo .hex (previamente probado en la simula
 \end{figure}
 
 \noindent
-Después procedimos a terminar el armado y verificar nuevamente que todo estuviera en su lugar, descubriendo que el error cometido anteriormente fue que habían alambres mal conectados, mismo error que fue corregido más adelante.
+Después procedimos a terminar el armado y verificar nuevamente que todo estuviera en su 
+lugar, descubriendo que el error cometido anteriormente fue que habían alambres mal 
+conectados, mismo error que fue corregido más adelante.
 
 \begin{figure}[ht]
 	\centering
@@ -64,7 +78,9 @@ Después procedimos a terminar el armado y verificar nuevamente que todo estuvie
 \end{figure}
 
 \noindent
-Una vez corregidos los errores procedimos a probar el circuito haciendo uso de nuestra fuente de poder, el resultado fue satisfactorio pues las secuencias programadas se concretaron como estaban programadas.
+Una vez corregidos los errores procedimos a probar el circuito haciendo uso de nuestra 
+fuente de poder, el resultado fue satisfactorio pues las secuencias programadas se 
+concretaron como estaban programadas.
 
 \begin{figure}[ht]
 	\centering
@@ -198,4 +214,11 @@ __delay_ms(400);
 
 \subsection{Conclusi\'on}
 \noindent
-Logramos desarrollar y programar tres secuencias de LEDs usando el PIC16F628A, 2 arreglos (uno para las secuencias 1 y 2, el otro para la secuencia 3) y ciclos for, lo cual ayudó a organizar mejor el código. También se reforzó el uso del simulador para verificar el funcionamiento del programa antes de implementarlo físicamente, pues en la simulación en proteus el programa funcionó bien y las secuencias de LEDs se ejecutaron sin errores, pero en el circuito no se logró el funcionamiento correcto al primer intento, por lo que tuvimos revisar cuidadosamente las conexiones y cambiar algunas conexiones. 
+Logramos desarrollar y programar tres secuencias de LEDs usando el PIC16F628A, 2 
+arreglos (uno para las secuencias 1 y 2, el otro para la secuencia 3) y ciclos for, 
+lo cual ayudó a organizar mejor el código. También se reforzó el uso del simulador para 
+verificar el funcionamiento del programa antes de implementarlo físicamente, pues en la 
+simulación en proteus el programa funcionó bien y las secuencias de LEDs se ejecutaron 
+sin errores, pero en el circuito no se logró el funcionamiento correcto al primer 
+intento, por lo que tuvimos revisar cuidadosamente las conexiones y cambiar algunas 
+conexiones. 

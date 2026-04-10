@@ -2,11 +2,13 @@
 
 \subsection{Introducción}
 \noindent
-En esta práctica se programó el PIC16F628A con el objetivo de que sea un contador desde el número 1 al 99 usando 2 decodificadores uno para el puerto A y el otro para el puerto B.
+En esta práctica se programó el PIC16F628A con el objetivo de que sea un contador desde 
+el número 1 al 99 usando 2 decodificadores uno para el puerto A y el otro para el puerto B.
 
 \subsection{Materiales}
 \noindent
-Para la realización de esta práctica utilizamos los siguientes materiales y herramientas:
+Para la realización de esta práctica utilizamos los siguientes materiales y 
+herramientas:
 \begin{itemize}
 	\item Microcontrolador PIC16F628A
 	\item Display de 7 segmentos
@@ -35,7 +37,10 @@ Para la realización de esta práctica utilizamos los siguientes materiales y he
 
 \subsection{Desarrollo}
 \noindent
-Se observa el microcontrolador PIC16F628A colocado en la protoboard. Se conectan  el cristal de 4 MHz con sus capacitores en los pines , y la resistencia . Esto establece la base para que el microcontrolador funcione a la frecuencia configurada de 4 MHz (Figura \ref{fig:conexmicro}).
+Se observa el microcontrolador PIC16F628A colocado en la protoboard. Se conectan el 
+cristal de 4 MHz con sus capacitores en los pines , y la resistencia . Esto 
+establece la base para que el microcontrolador funcione a la frecuencia configurada 
+de 4 MHz (Figura \ref{fig:conexmicro}).
 
 \begin{figure}
 	\centering
@@ -55,7 +60,8 @@ Se incorporan dos displays de siete segmentos de ánodo común (7SEG-COM-AN-GRN)
 \end{figure}
 
 \noindent
-Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodificadores 7447 y 7448. Desde estos, se conectan a los displays de siete segmentos (Figura \ref{fig:cableadoprac06}).
+Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodificadores 
+7447 y 7448. Desde estos, se conectan a los displays de siete segmentos (Figura \ref{fig:cableadoprac06}).
 \begin{figure}
 	\centering
 	\includegraphics[width = 0.5 \textwidth]{cableado_prac06.png}
@@ -64,7 +70,9 @@ Se realiza el cableado desde los puertos A y B del PIC16F628A hacia los decodifi
 \end{figure}
 
 \noindent
-La imagen muestra el sistema ya energizado (Figura \ref{fig:funciona06}). Los dos displays de siete segmentos están encendidos y muestran una secuencia numérica que cambia cada 500 ms, contando de 01 a 99.
+La imagen muestra el sistema ya energizado (Figura \ref{fig:funciona06}). Los dos 
+displays de siete segmentos están encendidos y muestran una secuencia numérica que 
+cambia cada 500 ms, contando de 01 a 99.
 \begin{figure}
 	\centering
 	\includegraphics[width = 0.5 \textwidth]{funciona_06.png}
@@ -96,7 +104,8 @@ La imagen muestra el sistema ya energizado (Figura \ref{fig:funciona06}). Los do
 (RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming)
 #pragma config CPD = OFF        // Data EE Memory Code Protection bit 
 (Data memory code protection off)
-#pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
+#pragma config CP = OFF         // Flash Program Memory Code Protection bit 
+(Code protection off)
 
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
@@ -134,4 +143,6 @@ void main(void) {
 
 \subsection{Conclusi\'on}
 \noindent
-Durante el desarrollo de esta práctica aprendimos a usar decodificadores correctamente a falta de un segundo PIC; a su vez, vamos aprendiendo más sobre electrónica. Lo cual se notó ya que el circuito nos prendió al primer intento.
+Durante el desarrollo de esta práctica aprendimos a usar decodificadores correctamente a 
+falta de un segundo PIC; a su vez, vamos aprendiendo más sobre electrónica. Lo cual se 
+notó ya que el circuito nos prendió al primer intento.
