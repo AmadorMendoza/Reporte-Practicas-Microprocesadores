@@ -29,7 +29,7 @@
 		\includegraphics[width = 0.8 \textwidth]{PROY_01.png}
 		\caption{Circuito exportado de Proteus}
 		\label{fig:proy01}
-	\end{figure}
+  \end{figure}
 
 \subsection{Desarrollo}
 \noindent
@@ -37,28 +37,57 @@
   para posteriorment	e, en el software de MPLAB, en código C, hacer el programa .hex, 
   el cual probamos en una 	simulación en proteus.\\
   Una vez hecho esto, procedimos a conectar en nuestro Protoboard los materiales 
-  necesario	s.
+  necesario>s (Figura \ref{fig:concomponentes})
 
-	\begin{figure}[H]
+  \begin{figure}[ht]
 		\centering
-		\includegraphics[width = 0.8 \textwidth]{.png}
+		\includegraphics[width = 0.5 \textwidth]{con_componentes.jpg}
 		\caption{Conexion de componentes}
 		\label{fig:concomponentes}
 	\end{figure}
 \noindent	
 	Programamos el PIC16F628A con ayuda de nuestro PicKit 3, y lo conectamos a nuestro 
-  protoboard.
+  protoboard (Figura \ref{fig:picproy01}.
 
-	%aqui va otra figura
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width = 0.5 \textwidth]{pic_proy01.jpg}
+		\caption{Conexión de Componentes con el PIC16F628A}
+		\label{fig:picproy01}
+	\end{figure}
+  
 \noindent	
 	Este fue nuestro primer intento, y no prendió, nos dimos cuenta de que estaba mal 
-  conectado en el puenteo.
+  conectado en el puenteo (Figura \ref{fig:intentoproy01}.
 
-	%otra figura
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width = 0.5 \textwidth]{intento_proy01.jpg}
+		\caption{Primer intento de prender el circuito.}
+		\label{fig:intentoproy01}
+	\end{figure}
+  
 \noindent	
-	Ya al corregir todo volvimos a probar, y ya nos salió.
+  Ya al corregir todo volvimos a probar, y ya nos salió(Figura \ref{fig:funciona1proy01}).
 
-	%otra figura
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{funciona1_proy01.jpg}
+%        \caption{Semaforos en estados contrarios}
+        \label{fig:funciona1proy01}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{funciona1_proy01.jpg}
+%        \caption{Semaforo parpadeando}
+        \label{fig:funciona2proy01}
+    \end{minipage}
+    \caption{Circuito conectado y en funcionamiento}
+\end{figure}
+\clearpage 
 
 \subsection{C\'odigo en C}
 	\begin{verbatim}
