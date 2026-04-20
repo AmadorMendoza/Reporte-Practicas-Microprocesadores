@@ -35,56 +35,56 @@
 \noindent
 	Empezamos esta práctica haciendo el diagrama en proteus (Figura \ref{fig:proy01}), 
   para posteriorment	e, en el software de MPLAB, en código C, hacer el programa .hex, 
-  el cual probamos en una 	simulación en proteus.\\
-  Una vez hecho esto, procedimos a conectar en nuestro Protoboard los materiales 
+  el cual probamos en una 	simulación en proteus. Una vez hecho esto, procedimos a conectar en nuestro Protoboard los materiales 
   necesario>s (Figura \ref{fig:concomponentes})
 
-  \begin{figure}[ht]
+  \begin{figure}[H]
 		\centering
-		\includegraphics[width = 0.5 \textwidth]{con_componentes.jpg}
-		\caption{Conexion de componentes}
-		\label{fig:concomponentes}
-	\end{figure}
+    \begin{subfigure}{0.45\textwidth}
+      \centering
+      \includegraphics[width = 0.5 \textwidth]{con_componentes.jpg}
+		  \caption{Conexion de componentes}
+		  \label{fig:concomponentes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+		  \centering
+		  \includegraphics[width = 0.5 \textwidth]{pic_proy01.jpg}
+		  \caption{Conexión de Componentes con el PIC16F628A}
+		  \label{fig:picproy01}
+    \end{subfigure}
+  \end{figure}
+
+
 \noindent	
 	Programamos el PIC16F628A con ayuda de nuestro PicKit 3, y lo conectamos a nuestro 
-  protoboard (Figura \ref{fig:picproy01}.
-
-	\begin{figure}[ht]
-		\centering
-		\includegraphics[width = 0.5 \textwidth]{pic_proy01.jpg}
-		\caption{Conexión de Componentes con el PIC16F628A}
-		\label{fig:picproy01}
-	\end{figure}
-  
-\noindent	
-	Este fue nuestro primer intento, y no prendió, nos dimos cuenta de que estaba mal 
-  conectado en el puenteo (Figura \ref{fig:intentoproy01}.
-
-	\begin{figure}[ht]
-		\centering
-		\includegraphics[width = 0.5 \textwidth]{intento_proy01.jpg}
-		\caption{Primer intento de prender el circuito.}
-		\label{fig:intentoproy01}
-	\end{figure}
-  
-\noindent	
+  protoboard (Figura \ref{fig:picproy01}). Este fue nuestro primer intento, y no prendió, 
+  nos dimos cuenta de que estaba mal conectado en el puenteo (Figura \ref{fig:intentoproy01}).
   Ya al corregir todo volvimos a probar, y ya nos salió(Figura \ref{fig:funciona1proy01}).
+
+  \begin{figure}[ht]
+		  \centering
+		  \includegraphics[width = 0.30 \textwidth]{intento_proy01.jpg}
+		  \caption{primer intento de prender el circuito.}
+		  \label{fig:intentoproy01}
+	\end{figure}
 
 \begin{figure}[ht]
     \centering
-    \begin{minipage}{0.35\textwidth}
+    \begin{minipage}{0.30\textwidth}
         \centering
         \includegraphics[width=\textwidth]{funciona1_proy01.jpg}
 %        \caption{Semaforos en estados contrarios}
         \label{fig:funciona1proy01}
     \end{minipage}
     \hfill
-    \begin{minipage}{0.35\textwidth}
+    \begin{minipage}{0.30\textwidth}
         \centering
         \includegraphics[width=\textwidth]{funciona1_proy01.jpg}
 %        \caption{Semaforo parpadeando}
         \label{fig:funciona2proy01}
     \end{minipage}
+    %\label{fig:funcionaproy01}
     \caption{Circuito conectado y en funcionamiento}
 \end{figure}
 \clearpage 
