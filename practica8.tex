@@ -1,1 +1,118 @@
+% =========================================================================
+% PRÁCTICA 8: SECUENCIADOR MEDIANTE BARRA DE LEDS
+% =========================================================================
+\section{Práctica 8: Secuenciador mediante Barra de LEDs}
 
+\subsection{Descripción General}
+En este desarrollo experimental se diseñó e implementó un sistema de control de efectos lumínicos empleando el microcontrolador PIC16F877A acoplado a un arreglo lineal de diodos (Barra gráfica de LEDs). El propósito principal radica en la gestión de flujos de salida digitales mediante la monitorización activa (\textit{polling}) de terminales de entrada discretas. A través de la manipulación de registros y máscaras de bits, el sistema conmuta en tiempo real entre un estado de reposo y tres rutinas dinámicas de iluminación independientes.
+
+\subsection{Componentes Utilizados}
+El hardware seleccionado para la implementación física comprende los siguientes elementos:
+\begin{itemize}
+    \item \textbf{Elementos de Control y Procesamiento:} 1 Microcontrolador PIC16F877A, 1 Programador PICkit 3.
+    \item \textbf{Frecuencia y Estabilización:} 1 Cristal de cuarzo de $4\text{ MHz}$, 2 Capacitores cerámicos de $22\text{ pF}$.
+    \item \textbf{Interfaz de Entrada/Salida:} 1 Barra de LEDs, 1 Pulsador (\textit{Push button}).
+    \item \textbf{Red de Resistencias:} 4 Resistencias de $220\ \Omega$, 1 Resistencia de $1\text{ k}\Omega$.
+    \item \textbf{Soporte Físico:} 1 Placa de pruebas (\textit{Protoboard}) y conductores eléctricos variados.
+\end{itemize}
+
+\subsection{Entorno de Desarrollo Software}
+\begin{itemize}
+    \item \textbf{IDE:} MPLAB X IDE v6.25.
+    \item \textbf{Compilador:} MPLAB XC8 Compiler.
+    \item \textbf{Entorno de Simulación:} Proteus 8.
+\end{itemize}
+
+\subsection{Análisis Operativo y Arquitectura Lógica}
+El algoritmo base rige su comportamiento de acuerdo con el estado lógico de los pines menos significativos del Puerto A (\texttt{RA0}, \texttt{RA1} y \texttt{RA2}). Al deshabilitar los módulos de comparación analógica a través del registro \texttt{CMCON}, estas terminales operan como lecturas digitales discretas provenientes de un arreglo de conmutación.
+
+La distribución estructural del firmware se divide en:
+\begin{enumerate}
+    \item \textbf{Estado de Inactividad (Reposo):} Si no se detecta ningún estímulo alto en las entradas, el Puerto B se fuerza a un estado nulo (\texttt{0x00}), extinguiendo la iluminación y pausando el flujo mediante una subrutina de retención anti-rebote.
+    \item \textbf{Efecto Estroboscópico (Secuencia 1):} Conmuta rítmicamente bloques de 4 bits (nibbles) con temporizaciones de $300\text{ ms}$, alternando de forma simétrica entre \texttt{0xF0} y \texttt{0x0F}.
+    \item \textbf{Barrido Lateral Inyectado (Secuencia 2):} Desplaza un bit encendido de derecha a izquierda saltando de forma deliberada el canal \texttt{RB4} mediante la asignación directa del valor \texttt{0x20} posterior a \texttt{0x08}.
+    \item \textbf{Barrido de Fase Alta (Secuencia 3):} Variante indexada que arranca la propagación del bit en la zona superior de la barra (\texttt{RB5}) y desciende de manera cíclica hacia los primeros canales.
+\end{enumerate}
+
+\subsection{Código de Control en C}
+\begin{lstlisting}[language=C, caption={Firmware del Secuenciador para la barra de LEDs}, label={code:practica8}]
+#pragma config FOSC = XT       // Oscilador de cristal externo estandar
+#pragma config WDTE = OFF      // Desactivacion del Watchdog Timer
+#pragma config PWRTE = ON      // Habilitacion del temporizador de encendido
+#pragma config MCLRE = ON      // Master Clear habilitado externamente
+#pragma config BOREN = ON      // Reset por caida de tension activo
+#pragma config LVP = OFF       // Programacion en bajo voltaje inhabilitada
+#pragma config CPD = OFF       // Proteccion de datos EEPROM nula
+#pragma config CP = OFF        // Proteccion de codigo de programa nula
+
+#define _XTAL_FREQ 4000000     // Frecuencia operativa de 4MHz para macros de retraso
+
+#include <xc.h>
+
+// Definicion de modulos de software
+void suspender_flujo(void);
+void configurar_perifericos(void);
+void ejecutar_patron_a(void);
+void ejecutar_patron_b(void);
+void ejecutar_patron_c(void);
+
+void main(void) {
+    configurar_perifericos();
+    
+    while(1) {
+        // Validacion de estado neutro: sin entradas activas
+        if(RA0 == 0 && RA1 == 0 && RA2 == 0) {
+            PORTB = 0x00;
+            suspender_flujo(); 
+        }
+        
+        // Disparo selectivo de rutinas
+        if(RA0 == 1 && RA1 == 0 && RA2 == 0) { ejecutar_patron_a(); }
+        if(RA0 == 0 && RA1 == 1 && RA2 == 0) { ejecutar_patron_b(); }
+        if(RA0 == 0 && RA1 == 0 && RA2 == 1) { ejecutar_patron_c(); }
+    }
+}
+
+void suspender_flujo(void) {
+    while(RA0 == 0 && RA1 == 0 && RA2 == 0) {
+        // Bucle de espera pasiva hasta cambio de estado
+    }
+    __delay_ms(100); // Mitigacion de transitorios mecanicos
+}
+
+void configurar_perifericos(void) {
+    CMCON  = 0x07;  // Inactivacion de comparadores, pines en modo digital
+    TRISA  = 0x07;  // Terminales RA0, RA1, RA2 configuradas como entradas
+    TRISB  = 0x00;  // Puerto B completo actuando como bus de salida
+    PORTA  = 0x08;  // Estado inicial preventivo para RA3
+    PORTB  = 0x00;  // Inicializacion de salidas en estado bajo
+}
+
+void ejecutar_patron_a(void) {
+    PORTB = 0xF0; __delay_ms(300);
+    PORTB = 0x0F; __delay_ms(300);
+}
+
+void ejecutar_patron_b(void) {
+    PORTB = 0x01; __delay_ms(300);
+    PORTB = 0x02; __delay_ms(300);
+    PORTB = 0x04; __delay_ms(300);
+    PORTB = 0x08; __delay_ms(300);
+    PORTB = 0x20; __delay_ms(300); // Bifurcacion: Omision selectiva de RB4
+    PORTB = 0x40; __delay_ms(300);
+    PORTB = 0x80; __delay_ms(300);
+}
+
+void ejecutar_patron_c(void) {
+    PORTB = 0x20; __delay_ms(300);
+    PORTB = 0x40; __delay_ms(300);
+    PORTB = 0x80; __delay_ms(300);
+    PORTB = 0x01; __delay_ms(300);
+    PORTB = 0x02; __delay_ms(300);
+    PORTB = 0x04; __delay_ms(300);
+    PORTB = 0x08; __delay_ms(300);
+}
+\end{lstlisting}
+
+\subsection{Conclusiones}
+La implementación física ratificó la viabilidad del microcontrolador PIC16F877A para conmutar flujos de potencia digitales en respuesta a interacciones externas[cite: 37]. Se concluye que la correcta manipulación de registros estructurales como \texttt{TRIS} y \texttt{CMCON} es imperativa; omitir la desconfiguración analógica provocaría lecturas flotantes erráticas en el bus de entrada[cite: 38, 39]. Asimismo, la modularización del firmware a través de funciones dedicadas optimiza la legibilidad del código y mitiga de forma eficiente el impacto de los rebotes mecánicos en las terminales activas[cite: 40, 41].
