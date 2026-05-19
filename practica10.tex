@@ -1,1 +1,172 @@
+\section*{\textbf{PRÁCTICA 10: Mensaje en Display lcd 16x2}}
+\textbf{10.1: Introducción}
 
+\begin{quote}
+Se desarrolló un sistema embebido con el PIC16F877A para controlar una pantalla LCD alfanumérica utilizando una interfaz eficiente de 4 bits. Programado bajo un esquema modular en C (XC8), el firmware separa de forma clara las funciones de configuración del display, comandos de control y escritura de texto. La transferencia de datos se resolvió mediante los cuatro pines más significativos del Puerto D, enviando la información en dos ráfagas sucesivas (nibbles); en paralelo, las líneas RS y EN gestionaron la naturaleza de los datos y la sincronización de los ciclos de reloj. Mediante esta arquitectura, el sistema logró proyectar de forma intermitente información de identificación en la pantalla. El ejercicio sirvió para profundizar en la integración de periféricos estándar, el direccionamiento por punteros para optimizar memoria, la manipulación de registros y los fundamentos de comunicación síncronica.
+
+\end{quote}
+
+ \textbf{10.2: Lista de materiales}
+\begin{itemize}
+    \item 1 Protoboard
+    \item 2 Capacitores 22pF
+    \item 1 Crystal de cuarzo 4 MHz
+    \item 1 PIC16F877A
+    \item 1 Display LCD 16x2
+    \item 4 Resistencias de 220 $\Omega$
+    \item 1 Resistencia de 1k
+    \item 1 Push Button
+    \item Cables/Jumpers
+    \item Pickit 3
+
+\end{itemize}
+\textbf{10.3: Software}
+\begin{itemize}
+    \item MPLAB X IDE v6.25
+    \item Pickit 3 v3.10
+    \item Proteus 8
+\end{itemize}
+\textbf{10.4: Desarrollo}
+
+El software gestiona el enlace entre el microcontrolador y el módulo LCD a través de un bus de datos de 4 bits. Bajo esta configuración, cada byte (ya sea una instrucción de control o un carácter de texto) se fragmenta y se transmite en dos etapas sucesivas utilizando los pines más significativos del Puerto D. El firmware incorpora rutinas específicas para la inicialización del display bajo parámetros estándar, la manipulación de la línea RS para diferenciar comandos de caracteres, y la generación de pulsos de reloj en el pin EN para validar la recepción de la información. Dentro de la rutina principal, el sistema despliega mensajes intermitentes de forma dinámica, optimizando la lectura de las cadenas de texto mediante el uso de punteros dentro de la función \verb|LCDString|. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{practica 10/PROY_11.png}
+    \caption{Figura: Diagrama en Proteus}
+\end{figure}
+
+\textbf{10.4.1: Código en C:}
+
+\begin{lstlisting}[language=C]
+#include <xc.h>
+#define _XTAL_FREQ 4000000
+
+// CONFIG
+#pragma config FOSC = XT
+#pragma config WDTE = OFF
+#pragma config PWRTE = OFF
+#pragma config BOREN = ON
+#pragma config LVP = OFF
+#pragma config CPD = OFF
+#pragma config WRT = OFF
+#pragma config CP = OFF
+
+#define RS RD0
+#define EN RD1
+
+void LCD_Command(unsigned char cmd);
+void LCD_Char(unsigned char data);
+void LCD_Init(void);
+void LCD_String(const char *str);
+
+
+void main(void) {
+    TRISD = 0x00;
+    PORTD = 0x00;
+
+    while(1){
+   
+    LCD_Init();
+    LCD_String("Hola este es un");
+   
+    __delay_ms(2000);
+
+    LCD_Command(0xC0);
+    LCD_String("PIC16F877A");
+   
+    }
+    return;
+}
+
+void LCD_Command(unsigned char cmd)
+{
+    RS = 0;
+    PORTD = (PORTD & 0x0F) | (unsigned char)(cmd & 0xF0);
+    EN = 1;
+    __delay_ms(20);
+    EN = 0;
+
+    PORTD = (PORTD & 0x0F) | (unsigned char)(cmd << 4);
+    EN = 1;
+    __delay_ms(20);
+    EN = 0;
+}
+
+void LCD_Char(unsigned char data)
+{
+    RS = 1;
+    PORTD = (PORTD & 0x0F) | (data & 0xF0);
+    EN = 1;
+    __delay_ms(20);
+    EN = 0;
+
+    PORTD = (PORTD & 0x0F) | (unsigned char)(data << 4);
+    EN = 1;
+    __delay_ms(20);
+    EN = 0;
+}
+
+void LCD_Init(void)
+{
+    __delay_ms(20);
+    LCD_Command(0x02);
+    LCD_Command(0x28);
+    LCD_Command(0x0C);
+    LCD_Command(0x06);
+    LCD_Command(0x01);
+}
+
+void LCD_String(const char *str) //USANDO PUNTEROS
+{
+    while(*str)
+    {
+        LCD_Char(*str);
+        str++;
+    }
+};
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{practica 10/6.jpg}
+    \caption{Diagrama en Proteus en ejecución}
+\end{figure}
+
+\textbf{10.4.2: Realización de la práctica}
+
+\begin{figure}[htbp]
+    \centering
+    % ---- PRIMERA IMAGEN ----
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{practica 10/3.jpeg}
+        \caption{Armado de componentes}
+        \label{fig:primera}
+    \end{subfigure}
+    \hfill % Espacio elástico intermedio entre la 1 y la 2
+    % ---- SEGUNDA IMAGEN ----
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{practica 10/4.jpeg}
+        \caption{Ejecución de Práctica}
+        \label{fig:segunda}
+    \end{subfigure}
+    \hfill % Espacio elástico intermedio entre la 2 y la 3
+    % ---- TERCERA IMAGEN ----
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{practica 10/5.jpeg}
+        \caption{Ejecución de Práctica}
+        \label{fig:tercera}
+    \end{subfigure}
+    
+    % Caption general de todo el bloque de figuras
+    \vspace{10pt} % Añade un pequeño espacio vertical antes del título general
+    \caption{Proceso completo del armado y ejecución de la práctica.}
+    \label{fig:general}
+\end{figure}
+
+\textbf{10.5: Conclusiones}
+
+A través de esta práctica, se validó el desempeño de un sistema de control lógico basado en el microcontrolador PIC16F877A para la gestión de un prototipo robótico móvil, consiguiendo una sincronización precisa entre la tracción mecánica y los indicadores ópticos. Mediante el diseño de rutinas temporizadas, se modelaron con éxito las funciones esenciales de un automóvil real, incluyendo el encendido de luces de posición, destellos de advertencia y un ciclo de frenado vinculado a las luces de stop. Asimismo, la adopción de una arquitectura de programación modular optimizó el desarrollo del código al aislar las configuraciones de bajo nivel del hardware de las secuencias operativas del robot. El desarrollo de este proyecto consolidó competencias clave en la manipulación de puertos digitales, el acoplamiento de periféricos de salida con microcontroladores y el diseño de sistemas embebidos, demostrando el valor de integrar la señalización visual con el movimiento físico para crear sistemas mecatrónicos más eficientes y seguros.
