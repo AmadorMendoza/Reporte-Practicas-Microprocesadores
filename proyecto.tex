@@ -1,0 +1,1205 @@
+\begin{titlepage}
+    \centering
+    
+    % 1. Logotipo de la UAEH / ICBI
+    % Reemplaza "logo_uaeh.png" por el nombre exacto con el que subas la imagen a Overleaf
+    \includegraphics[width=0.45\textwidth]{portada.jpg} \par
+    \vspace{1cm}
+    
+    % 2. Encabezado institucional
+    {\large\bfseries Universidad Autónoma del Estado de Hidalgo \par}
+    \vspace{0.15cm}
+    {\large Instituto de Ciencias Básicas e Ingeniería \par}
+    \vspace{0.15cm}
+    {\large Licenciatura en Ciencias Computacionales \par}
+    \vspace{2.5cm}
+    
+    % 3. Título del Proyecto y Línea divisoria
+    {\huge\bfseries Proyecto Final \par}
+    \vspace{0.3cm}
+    \noindent\rule{\textwidth}{0.4pt} \par
+    \vspace{2.5cm}
+    
+    % 4. Bloque de Datos del Curso (Alineado a la izquierda con sangría)
+    \begin{flushleft}
+        \hspace{1.5cm} \large \textbf{Materia:} Programación de Microprocesadores \par
+        \vspace{0.3cm}
+        \hspace{1.5cm} \large \textbf{Docente:} Gabriela Medina Nájera \par
+        \vspace{0.3cm}
+        \hspace{1.5cm} \large \textbf{Semestre:} $4^\circ$ \hspace{1.5cm} \textbf{Grupo:} 3 \par
+        \vspace{0.3cm}
+        \hspace{1.5cm} \large \textbf{Equipo:}  \par
+        \vspace{1.5cm}
+        
+        % 5. Lista de Integrantes
+        \hspace{1.5cm} \large \textbf{Integrantes:} \par
+        \vspace{0.3cm}
+        \hspace{1.5cm} \large Amador Mendoza Jesus \par
+        \hspace{1.5cm} \large Castillo Gutiérrez Fernanda del Carmen \par
+        \hspace{1.5cm} \large Díaz García Axel Yael \par           \hspace{1.5cm} \large Martinez Martinez Victor Manuel \par
+        \hspace{1.5cm} \large Ramos Angeles Sarai \par
+    \end{flushleft}
+    
+    \vfill % Empuja la fecha automáticamente al extremo inferior de la hoja
+    
+    % 6. Fecha
+    {\large \textbf{Fecha:} 18 de mayo de 2026 \par}
+
+\end{titlepage}
+
+\clearpage
+
+\section*{Gráficadora con 8 matrices leds de 8x8}
+\subsection*{Introducción}
+
+\section{Introducción}
+
+El desarrollo de sistemas de visualización de información representa uno de los pilares fundamentales en el diseño de sistemas embebidos e interfaces humano-máquina (HMI). En el ámbito de la ingeniería y la computación, las matrices de diodos emisores de luz (LED) de 8x8 se consolidan como componentes esenciales para el despliegue de datos alfanuméricos y gráficos debido a su alta durabilidad, bajo consumo de potencia y versatilidad de escalamiento. 
+
+El presente proyecto final aborda el diseño e implementación de una graficadora digital basada en un arreglo en cascada de 8 a 9 matrices LED de 8x8, controladas mediante una arquitectura de microprocesamiento. Esta aplicación permite procesar señales o funciones matemáticas para proyectarlas dinámicamente en una pantalla de resolución extendida. A lo largo de este reporte, se detallará el análisis de los requisitos de hardware, la optimización de los algoritmos de barrido (multiplexación) y el desarrollo del firmware estructurado de manera modular, demostrando las competencias adquiridas en la materia de Programación de Microprocesadores.
+
+\section{Marco Teórico}
+
+Para comprender el funcionamiento de la graficadora propuesta, es necesario fundamentar los siguientes conceptos tecnológicos:
+
+\subsection{Microcontroladores y Gestión de Puertos}
+Un microcontrolador es un sistema en un chip (SoC) que integra una unidad central de procesamiento (CPU), memoria (RAM y Flash) y periféricos de entrada/salida. En aplicaciones de visualización, la velocidad de ejecución de las instrucciones y la manipulación binaria directa de los registros de los puertos digitales (TRIS, PORT) dictan la fluidez y tasa de refresco con la que se muestran los gráficos en pantalla.
+
+\subsection{Matrices LED de 8x8 y Multiplexación}
+Una matriz LED de 8x8 consta de 64 diodos interconectados en nodos de filas (ánodos) y columnas (cátodos). Controlar de forma independiente cada LED requeriría 64 pines del microcontrolador, lo cual resulta inviable. Para solucionar esto, se emplea la \textit{multiplexación}, técnica que enciende secuencialmente una fila o columna a la vez a altas velocidades. Aprovechando el fenómeno de la persistencia de la visión humana (POV, por sus siglas en inglés), el ojo percibe una imagen estática y continua si la frecuencia de refresco supera los 60 Hz.
+
+\subsection{Controladores de Pantalla Dedicados (MAX7219)}
+Dada la escala del proyecto (8 o 9 matrices), el control directo por software saturaría las líneas de E/S y el tiempo de procesamiento del microcontrolador. Por ello, se justifica el uso de controladores especializados como el circuito integrado MAX7219. Este dispositivo funciona como un driver de pantalla de cátodo común que conecta microprocesadores a matrices LED mediante una interfaz serial de 3 hilos compatible con el protocolo SPI (Serial Peripheral Interface), encargándose de la multiplexación interna y liberando de carga matemática a la unidad central.
+
+
+
+\subsection{Programación Modular y Algoritmos de Graficación}
+La representación de funciones en una cuadrícula discreta requiere la traducción de coordenadas cartesianas $(x, y)$ a un mapa de bits (bitmaps). La programación modular segmenta el código en capas: una capa de abstracción de hardware (configuración de pines y envíos SPI) y una capa lógica (algoritmos de dibujo de líneas, mapeo de funciones y cálculo de arreglos bidimensionales), garantizando un código mantenible, escalable y eficiente.
+
+\section{Objetivos}
+
+\subsection{Objetivo General}
+Diseñar, programar e implementar una graficadora digital funcional mediante un arreglo acoplado de 8 a 9 matrices LED de 8x8, administradas por un microcontrolador, para la visualización dinámica de ondas o señales lógicas.
+
+\subsection{Objetivos Específicos}
+\begin{itemize}
+    \item Desarrollar el firmware del sistema embebido utilizando programación modular para separar las funciones de comunicación de hardware de la lógica matemática de graficación.
+    \item Implementar un protocolo de comunicación serial eficiente (como SPI) para coordinar la transferencia de datos en cascada hacia los controladores de las matrices LED.
+    \item Diseñar un algoritmo de mapeo numérico que traduzca funciones matemáticas o lecturas de variables en posiciones discretas de la pantalla (matriz de píxeles).
+    \item Ensamble de los módulos de hardware en una infraestructura de circuito físico estable, garantizando la correcta distribución de corriente y voltajes de alimentación para evitar caídas de tensión en el arreglo de LEDs.
+\end{itemize}
+
+    \section{Componentes Utilizados}
+
+Para el desarrollo de la graficadora digital se emplearon distintos dispositivos electrónicos orientados al control, procesamiento y visualización de datos en una matriz LED de 16x16 píxeles.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Componente} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+PIC16F877A & 1 & Microcontrolador DIP-40 a 4 MHz \\
+\hline
+74HC595 & 4 & Registro de desplazamiento DIP-16 a 5V \\
+\hline
+ULN2803A & 2 & Driver de corriente DIP-18 \\
+\hline
+Matrices LED 8x8 & 4 & Matriz LED de ánodo común \\
+\hline
+Resistencias 330$\Omega$ & 16 & Limitación de corriente \\
+\hline
+Resistencias 1k$\Omega$ & 5 & Protección y polarización \\
+\hline
+Resistencias 4.7k$\Omega$ & 16 & Polarización \\
+\hline
+Capacitores cerámicos 22pF & 2 & Estabilización del cristal \\
+\hline
+Capacitores cerámicos 100pF & 8 & Filtrado y estabilidad \\
+\hline
+Push buttons & 4 & Selección de gráficas \\
+\hline
+Cristal de cuarzo & 1 & Generación de reloj \\
+\hline
+\end{tabular}
+\caption{Componentes utilizados en el proyecto}
+\end{table}
+
+El sistema utiliza un microcontrolador PIC16F877A encargado del procesamiento principal y control de la pantalla LED. Para expandir el número de salidas digitales se utilizaron registros de desplazamiento 74HC595 conectados en cascada.
+
+Las matrices LED fueron organizadas en una configuración 2x2, formando una resolución total de 16x16 píxeles.
+
+
+ \section{Diagrama Electrónico}
+
+El sistema electrónico de la graficadora digital fue diseñado utilizando un microcontrolador PIC16F877A como unidad principal de procesamiento. El circuito se encuentra conformado por cuatro registros de desplazamiento 74HC595, dos drivers de corriente ULN2803A y cuatro matrices LED de 8x8 organizadas en una configuración 2x2, formando una pantalla de 16x16 píxeles.
+
+La arquitectura del sistema permite controlar una gran cantidad de LEDs utilizando únicamente tres líneas de control provenientes del microcontrolador:
+
+\begin{itemize}
+    \item DATA
+    \item CLOCK
+    \item LATCH
+\end{itemize}
+
+Estas líneas permiten la transmisión serial de información hacia los registros de desplazamiento 74HC595.
+
+Los registros 74HC595 se encuentran conectados en cascada, permitiendo expandir el número de salidas digitales necesarias para el control de filas y columnas de las matrices LED.
+
+El sistema utiliza dos circuitos ULN2803A como etapa de potencia para manejar la corriente requerida por las matrices LED y evitar sobrecargas en el microcontrolador y en los registros de desplazamiento.
+
+Las matrices LED utilizadas son de ánodo común y se encuentran organizadas en una disposición 2x2, permitiendo obtener una resolución total de 16x16 píxeles.
+
+El microcontrolador opera mediante un cristal de cuarzo de 4 MHz acompañado de capacitores cerámicos de 22pF para garantizar estabilidad en la señal de reloj.
+
+Los botones pulsadores conectados al puerto B del microcontrolador permiten seleccionar las distintas funciones gráficas implementadas en el firmware.
+
+La alimentación general del sistema se realiza mediante una fuente de 5V regulados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{diagrama.jpg}
+\caption{Diagrama electrónico del sistema}
+\end{figure}
+
+\subsection{Conexiones Principales}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Señal} & \textbf{Función} \\
+\hline
+RC0 & DATA \\
+\hline
+RC1 & CLOCK \\
+\hline
+RC2 & LATCH \\
+\hline
+RB0 & Botón 1 \\
+\hline
+RB1 & Botón 2 \\
+\hline
+RB2 & Botón 3 \\
+\hline
+RB3 & Botón 4 \\
+\hline
+\end{tabular}
+\caption{Conexiones principales del sistema}
+\end{table}
+
+\section{Código en C}
+\begin{lstlisting}[language=C]
+#include <xc.h>
+
+// CONFIGURACIÓN DEL PIC16F877A
+
+#pragma config FOSC = XT
+#pragma config WDTE = OFF
+#pragma config PWRTE = ON
+#pragma config BOREN = ON
+#pragma config LVP = OFF
+#pragma config CPD = OFF
+#pragma config WRT = OFF
+#pragma config CP = OFF
+
+#define _XTAL_FREQ 4000000
+
+// 74HC595
+#define DATA    RC0
+#define CLOCK   RC1
+#define LATCH   RC2
+
+// Botones
+#define BTN0    RB0
+#define BTN1    RB1
+#define BTN2    RB2
+#define BTN3    RB3
+
+// FRAMEBUFFER 16x16 //No se que es eso pero Claudio me dijo que lo pusiera
+// Cada fila contiene 16 bits
+
+//15 - x
+unsigned int frame[16];
+unsigned char sin[] = {8,9,10,11,11,10,9,8,7,6,5,4,4,5,6,7};
+unsigned char gauss[] = {15,14,13,12,10,7,5,4,4,5,7,10,12,13,14,15};
+
+// Funciones
+
+void setup(void);
+void shiftOut(unsigned char data);
+void sendToRegisters(unsigned int rows, unsigned int cols);
+void clearFrame(void);
+void draw_y_equals_x(void);
+void refreshDisplay(void);
+
+
+void setup(void)
+{
+    // Desactivar entradas analógicas
+    ADCON1 = 0x06;
+
+    // PORTC salidas
+    TRISC0 = 0;
+    TRISC1 = 0;
+    TRISC2 = 0;
+
+    // PORTB entradas
+    TRISB0 = 1;
+    TRISB1 = 1;
+    TRISB2 = 1;
+    TRISB3 = 1;
+
+    PORTC = 0;
+    PORTB = 0;
+}
+
+// ENVÍO SERIAL A 74HC595
+
+void shiftOut(unsigned char data)
+{
+    unsigned char i;
+
+    for(i = 0; i < 8; i++)
+    {
+        CLOCK = 0;
+
+        if(data & 0x80)
+            DATA = 1;
+        else
+            DATA = 0;
+
+        data <<= 1;
+
+        CLOCK = 1;
+    }
+}
+
+// rows = filas activas
+// cols = columnas activas
+
+void sendToRegisters(unsigned int rows, unsigned int cols)
+{
+    LATCH = 0;
+
+    // COLUMNAS (16 bits)
+    shiftOut((cols >> 8) & 0xFF);   // columnas altas
+    shiftOut(cols & 0xFF);          // columnas bajas
+
+    // FILAS (16 bits)
+    shiftOut((rows >> 8) & 0xFF);   // filas altas
+    shiftOut(rows & 0xFF);          // filas bajas
+
+    LATCH = 1;
+}
+
+void clearFrame(void)
+{
+    unsigned char i;
+    for(i = 0; i < 16; i++)
+    {
+        frame[i] = 0x0000;
+    }
+}
+
+void setPixel(unsigned char x, unsigned char y)
+{
+    if(x < 16 && y < 16)
+    {
+        frame[y] |= (1 << x);
+    }
+}
+
+void draw_y_equals_x(void)
+{
+    unsigned char i;
+
+    clearFrame();
+
+    for(i = 0; i < 16; i++)
+    {
+        frame[i] = (1 << i); // Desplaza el bit i posiciones 
+    }
+}
+
+void draw_sinx()
+{
+    unsigned char x;
+    
+    clearFrame();
+
+    for(x = 0; x < 16; x++ )
+    {
+        setPixel(x,sin[x]);
+    }
+
+}
+
+void draw_gauss_bell_acumulated()
+{
+    unsigned char x,y;
+    clearFrame();
+    
+    setPixel(x,gauss[x]);
+    for(x = 0; x < 16; x++ )
+    {
+        for(y = gauss[x]; y < 16; y++ )
+        {
+            setPixel(x,y);
+        }
+    }
+}
+
+void draw_circle(int radio, int centroX, int centroY)
+{
+    unsigned char x, y;
+    clearFrame();
+    
+    for(x = 0; x < 16; x++)
+    {
+        for(y = 0; y < 16; y++)
+        {
+            // Ecuación: (x - cx)² + (y - cy)² = r²
+            int dx = x - centroX;
+            int dy = y - centroY;
+            
+            if(dx*dx + dy*dy <= radio*radio)
+            { 
+                frame[y] |= (1 << (15 - x));
+            }
+        }
+    }
+}
+
+
+// MULTIPLEXACIÓN
+
+void refreshDisplay(void)
+{
+    unsigned char row;
+
+    for(row = 0; row < 16; row++)
+    {
+        // Apagar todo antes de cambiar de fila
+        sendToRegisters(0x0000, 0x0000);
+
+        sendToRegisters((unsigned int)(1 << row), frame[row]);
+
+        __delay_us(800);   // tiempo encendido
+    }
+}
+// PROGRAMA PRINCIPAL
+
+void main(void)
+{
+    setup();
+    clearFrame();
+
+    while(1)
+    {
+
+        if(BTN0 == 1 )          
+        {
+            __delay_ms(20);    // Anti-rebote
+
+            if(BTN0 == 1)    
+            {
+                draw_y_equals_x();
+            }
+        }
+        if(BTN1 == 1 )          
+        {
+            __delay_ms(20);    // Anti-rebote
+
+            if(BTN1 == 1)    
+            {
+                draw_sinx();
+            }
+        }
+        if(BTN2 == 1 )          
+        {
+            __delay_ms(20);    // Anti-rebote
+
+            if(BTN2 == 1)    
+            {
+                draw_gauss_bell_acumulated();
+            }
+        }
+        if(BTN3 == 1)
+        {
+            __delay_ms(20);    // Anti-rebote
+
+            if(BTN3 == 1)    
+            {
+                draw_circle(5, 7,7);
+            }
+        
+        }
+        refreshDisplay();
+    }
+
+}
+\end{lstlisting}
+   \section{Configuración del Microcontrolador}
+
+El sistema utiliza un microcontrolador PIC16F877A encargado del procesamiento principal, control de la pantalla LED y ejecución de los algoritmos de graficación.
+
+La configuración inicial del microcontrolador se realiza mediante registros internos encargados de definir el comportamiento de los puertos digitales, reloj del sistema y periféricos de entrada y salida.
+
+\subsection{Configuración de Puertos TRIS}
+
+Los registros TRIS permiten definir si un pin funcionará como entrada o salida digital.
+
+En el sistema desarrollado, las líneas RC0, RC1 y RC2 fueron configuradas como salidas digitales para controlar los registros de desplazamiento 74HC595.
+
+\begin{verbatim}
+TRISC0 = 0;
+TRISC1 = 0;
+TRISC2 = 0;
+\end{verbatim}
+
+Estas líneas corresponden a:
+
+\begin{itemize}
+    \item RC0: DATA
+    \item RC1: CLOCK
+    \item RC2: LATCH
+\end{itemize}
+
+Por otro lado, las líneas RB0, RB1, RB2 y RB3 fueron configuradas como entradas digitales para la lectura de botones.
+
+\begin{verbatim}
+TRISB0 = 1;
+TRISB1 = 1;
+TRISB2 = 1;
+TRISB3 = 1;
+\end{verbatim}
+
+También se deshabilitaron las entradas analógicas mediante el registro ADCON1 para utilizar completamente los puertos como señales digitales.
+
+\begin{verbatim}
+ADCON1 = 0x06;
+\end{verbatim}
+
+\subsection{Configuración SPI}
+
+El proyecto no utiliza el módulo SPI hardware interno del PIC16F877A. En su lugar, se implementó una transmisión serial por software utilizando una técnica conocida como bit banging.
+
+La comunicación serial se realiza mediante las líneas:
+
+\begin{itemize}
+    \item DATA
+    \item CLOCK
+    \item LATCH
+\end{itemize}
+
+La función encargada de realizar la transmisión serial es:
+
+\begin{verbatim}
+void shiftOut(unsigned char data)
+\end{verbatim}
+
+Esta función transmite los bits de manera secuencial hacia los registros de desplazamiento 74HC595 mediante pulsos manuales de reloj.
+
+\subsection{Frecuencia }
+
+El sistema opera utilizando un cristal de cuarzo de 4 MHz conectado al microcontrolador PIC16F877A.
+
+La frecuencia del sistema se define mediante la instrucción:
+
+\begin{verbatim}
+#define _XTAL_FREQ 4000000
+\end{verbatim}
+
+Esta frecuencia permite generar correctamente los retardos utilizados durante la multiplexación y comunicación serial.
+
+La configuración del oscilador se establece mediante las directivas de configuración:
+
+\begin{verbatim}
+#pragma config FOSC = XT
+\end{verbatim}
+
+\subsection{Timers}
+
+El sistema no utiliza timers internos del microcontrolador.
+
+Los retardos necesarios para la multiplexación y anti-rebote de botones fueron implementados mediante funciones de software:
+
+\begin{verbatim}
+__delay_us(800);
+__delay_ms(20);
+\end{verbatim}
+
+El retardo de microsegundos se utiliza para controlar el tiempo de refresco de cada fila de la pantalla LED.
+
+El retardo de milisegundos se utiliza para eliminar rebotes mecánicos en los botones pulsadores.
+
+\subsection{Interrupciones}
+
+El sistema no utiliza interrupciones internas ni externas.
+
+Todo el funcionamiento se realiza mediante ejecución secuencial dentro del ciclo principal del programa:
+
+\begin{verbatim}
+while(1)
+{
+    refreshDisplay();
+}
+\end{verbatim}
+
+Dentro del ciclo principal se realiza continuamente:
+
+\begin{itemize}
+    \item lectura de botones,
+    \item actualización del framebuffer,
+    \item generación de gráficas,
+    \item y multiplexación de la pantalla LED.
+\end{itemize}
+
+\section{Comunicación Serial}
+
+El sistema implementa una comunicación serial síncrona para transmitir información desde el microcontrolador PIC16F877A hacia los registros de desplazamiento 74HC595.
+
+Aunque el protocolo utilizado comparte características similares con SPI (Serial Peripheral Interface), la transmisión fue implementada completamente por software mediante una técnica conocida como bit banging.
+
+\subsection{SPI}
+
+SPI (Serial Peripheral Interface) es un protocolo de comunicación serial síncrona utilizado para transferir datos entre un dispositivo maestro y uno o varios dispositivos esclavos.
+
+En este tipo de comunicación, el dispositivo maestro genera la señal de reloj y controla el envío de datos hacia los dispositivos esclavos.
+
+La comunicación SPI tradicional utiliza principalmente las siguientes líneas:
+
+\begin{itemize}
+    \item MOSI (Master Output Slave Input)
+    \item MISO (Master Input Slave Output)
+    \item CLK (Clock)
+    \item CS/SS (Chip Select / Slave Select)
+\end{itemize}
+
+En el proyecto desarrollado únicamente se requiere transmisión de datos desde el microcontrolador hacia los registros de desplazamiento, por lo que no se utiliza línea MISO.
+
+\subsection{Arquitectura Maestro-Esclavo}
+
+En el sistema implementado:
+
+\begin{itemize}
+    \item El PIC16F877A funciona como dispositivo maestro.
+    \item Los registros 74HC595 funcionan como dispositivos esclavos.
+\end{itemize}
+
+El microcontrolador es responsable de:
+
+\begin{itemize}
+    \item generar la señal de reloj,
+    \item transmitir los datos seriales,
+    \item y actualizar las salidas de los registros.
+\end{itemize}
+
+\subsection{Líneas de Comunicación}
+
+La comunicación serial implementada utiliza tres líneas principales:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Línea} & \textbf{Pin PIC} & \textbf{Función} \\
+\hline
+DATA & RC0 & Transmisión de datos seriales \\
+\hline
+CLOCK & RC1 & Señal de sincronización \\
+\hline
+LATCH & RC2 & Actualización de salidas \\
+\hline
+\end{tabular}
+\caption{Líneas de comunicación serial}
+\end{table}
+
+La línea DATA cumple una función equivalente a MOSI en SPI tradicional.
+
+La línea CLOCK sincroniza el desplazamiento de bits dentro de los registros 74HC595.
+
+La línea LATCH cumple una función similar a CS/SS, permitiendo actualizar simultáneamente las salidas del registro.
+
+\subsection{Transmisión de Datos}
+
+La transmisión serial se realiza mediante la función:
+
+\begin{verbatim}
+void shiftOut(unsigned char data)
+\end{verbatim}
+
+Esta función envía los datos bit por bit hacia los registros de desplazamiento.
+
+El algoritmo realiza los siguientes pasos:
+
+\begin{enumerate}
+    \item Colocar un bit sobre la línea DATA.
+    \item Generar un pulso de reloj mediante CLOCK.
+    \item Desplazar el siguiente bit.
+    \item Repetir el proceso hasta completar los 8 bits.
+\end{enumerate}
+
+El envío de información se realiza utilizando desplazamientos binarios:
+
+\begin{verbatim}
+if(data & 0x80)
+    DATA = 1;
+else
+    DATA = 0;
+
+data <<= 1;
+\end{verbatim}
+
+Después de transmitir todos los datos, la línea LATCH actualiza simultáneamente las salidas de los registros:
+
+\begin{verbatim}
+LATCH = 1;
+\end{verbatim}
+
+\subsection{Registros en Cascada}
+
+Los cuatro registros 74HC595 fueron conectados en cascada para ampliar el número de salidas disponibles.
+
+Esta configuración permite controlar las 16 filas y 16 columnas de la pantalla LED utilizando únicamente tres líneas de control provenientes del microcontrolador.
+
+La transmisión ocurre de manera secuencial, enviando primero los datos correspondientes a columnas y posteriormente los datos correspondientes a filas.
+
+\begin{verbatim}
+shiftOut((cols >> 8) & 0xFF);
+shiftOut(cols & 0xFF);
+
+shiftOut((rows >> 8) & 0xFF);
+shiftOut(rows & 0xFF);
+\end{verbatim}
+
+Este método permite controlar eficientemente la pantalla LED de 16x16 píxeles mediante multiplexación dinámica.
+
+\section{Programación del Firmware}
+
+El firmware del sistema fue desarrollado en lenguaje C utilizando MPLAB X IDE y el compilador XC8 para el microcontrolador PIC16F877A.
+
+La programación se estructuró de forma modular para facilitar la organización del código, el mantenimiento del sistema y la implementación de nuevas funciones gráficas.
+
+El programa principal se encarga de:
+
+\begin{itemize}
+    \item configurar el hardware,
+    \item controlar la comunicación serial,
+    \item actualizar la pantalla LED,
+    \item detectar entradas de botones,
+    \item y generar las funciones matemáticas.
+\end{itemize}
+
+\subsection{Bibliotecas Utilizadas}
+
+El firmware utiliza la biblioteca principal:
+
+\begin{verbatim}
+#include <xc.h>
+\end{verbatim}
+
+Esta biblioteca proporciona acceso a:
+
+\begin{itemize}
+    \item registros internos del PIC16F877A,
+    \item configuración de puertos,
+    \item retardos,
+    \item y control del hardware.
+\end{itemize}
+
+También se define la frecuencia del sistema mediante:
+
+\begin{verbatim}
+#define _XTAL_FREQ 4000000
+\end{verbatim}
+
+Esta definición permite utilizar correctamente las funciones de retardo.
+
+\subsection{Estructura General del Código}
+
+El firmware se encuentra dividido en varias secciones principales:
+
+\begin{itemize}
+    \item configuración del microcontrolador,
+    \item comunicación serial,
+    \item framebuffer,
+    \item algoritmos gráficos,
+    \item multiplexación,
+    \item y programa principal.
+\end{itemize}
+
+\subsection{Configuración del Hardware}
+
+La función setup() inicializa los puertos digitales y configura las líneas de control utilizadas por el sistema.
+
+\begin{verbatim}
+void setup(void)
+{
+    ADCON1 = 0x06;
+
+    TRISC0 = 0;
+    TRISC1 = 0;
+    TRISC2 = 0;
+
+    TRISB0 = 1;
+    TRISB1 = 1;
+    TRISB2 = 1;
+    TRISB3 = 1;
+
+    PORTC = 0;
+    PORTB = 0;
+}
+\end{verbatim}
+
+\subsection{Framebuffer}
+
+El sistema utiliza un framebuffer para almacenar el estado lógico de cada LED de la pantalla.
+
+\begin{verbatim}
+unsigned int frame[16];
+\end{verbatim}
+
+Cada posición representa una fila de la matriz LED de 16x16.
+
+\subsection{Comunicación Serial}
+
+La transmisión serial hacia los registros 74HC595 se realiza mediante la función:
+
+\begin{verbatim}
+void shiftOut(unsigned char data)
+\end{verbatim}
+
+Esta función transmite los bits secuencialmente utilizando las líneas DATA y CLOCK.
+
+La actualización simultánea de salidas se realiza mediante:
+
+\begin{verbatim}
+void sendToRegisters(unsigned int rows,
+                     unsigned int cols)
+\end{verbatim}
+
+\subsection{Funciones de Graficación}
+
+El firmware implementa distintas funciones matemáticas y geométricas.
+
+\subsubsection{Recta y=x}
+
+\begin{verbatim}
+void draw_y_equals_x(void)
+\end{verbatim}
+
+Esta función genera una línea diagonal sobre la pantalla LED.
+
+\subsubsection{Función Seno}
+
+\begin{verbatim}
+void draw_sinx()
+\end{verbatim}
+
+La onda seno se genera mediante valores discretizados almacenados en un arreglo.
+
+\subsubsection{Campana Gaussiana}
+
+\begin{verbatim}
+void draw_gauss_bell_acumulated()
+\end{verbatim}
+
+Esta función representa una aproximación discreta de una campana gaussiana.
+
+\subsubsection{Representación Circular}
+
+\begin{verbatim}
+void draw_circle(int radio,
+                 int centroX,
+                 int centroY)
+\end{verbatim}
+
+La función utiliza la ecuación matemática del círculo para activar los píxeles correspondientes.
+
+\subsection{Multiplexación}
+
+La función encargada de actualizar continuamente la pantalla es:
+
+\begin{verbatim}
+void refreshDisplay(void)
+\end{verbatim}
+
+Esta función realiza el barrido secuencial de filas para generar el efecto visual continuo mediante multiplexación.
+
+\subsection{Algoritmo Principal}
+
+El programa principal se ejecuta continuamente dentro de un ciclo infinito:
+
+\begin{verbatim}
+while(1)
+{
+    refreshDisplay();
+}
+\end{verbatim}
+
+Dentro del ciclo principal se realizan las siguientes tareas:
+
+\begin{enumerate}
+    \item Lectura de botones.
+    \item Selección de función gráfica.
+    \item Actualización del framebuffer.
+    \item Multiplexación de la pantalla LED.
+\end{enumerate}
+
+Cada botón activa una gráfica distinta:
+
+\begin{itemize}
+    \item BTN0: recta y=x
+    \item BTN1: función seno
+    \item BTN2: campana gaussiana
+    \item BTN3: círculo
+\end{itemize}
+
+El sistema permanece actualizando continuamente la pantalla para mantener una visualización estable y sin parpadeos visibles.
+
+\section{Algoritmo de Graficación}
+
+El sistema implementa un algoritmo de graficación discreta para representar funciones matemáticas y figuras geométricas sobre una matriz LED de 16x16 píxeles.
+
+Debido a que la pantalla posee una resolución limitada, las funciones matemáticas deben transformarse en coordenadas discretas capaces de representarse mediante LEDs individuales.
+
+\subsection{Sistema de Coordenadas}
+
+La pantalla LED trabaja utilizando un sistema de coordenadas cartesianas discretas definido por:
+
+\[
+0 \leq x < 16
+\]
+
+\[
+0 \leq y < 16
+\]
+
+Cada coordenada representa la posición de un LED dentro de la matriz.
+
+El eje horizontal corresponde a las columnas y el eje vertical corresponde a las filas.
+
+\subsection{Conversión de Coordenadas a LEDs}
+
+Para representar funciones matemáticas sobre la matriz LED, cada punto calculado debe convertirse en una posición física dentro de la pantalla.
+
+El sistema utiliza la función:
+
+\begin{verbatim}
+setPixel(x,y);
+\end{verbatim}
+
+Esta función activa un LED específico dentro del framebuffer.
+
+\begin{verbatim}
+void setPixel(unsigned char x,
+              unsigned char y)
+{
+    if(x < 16 && y < 16)
+    {
+        frame[y] |= (1 << x);
+    }
+}
+\end{verbatim}
+
+Cada bit del framebuffer representa el estado lógico de un LED.
+
+\subsection{Discretización}
+
+Las funciones matemáticas continuas no pueden representarse directamente sobre una pantalla de baja resolución.
+
+Por esta razón se utiliza un proceso de discretización, donde únicamente se representan puntos específicos de la función.
+
+El sistema calcula valores enteros de coordenadas para cada posición horizontal de la pantalla.
+
+\subsection{Recorrido de Coordenadas}
+
+El algoritmo principal realiza un recorrido horizontal de la pantalla mediante incrementos de la coordenada \(x\).
+
+\begin{verbatim}
+for(x = 0; x < 16; x++)
+\end{verbatim}
+
+Para cada valor de \(x\), el sistema calcula una coordenada vertical \(y\).
+
+Posteriormente se activa el LED correspondiente mediante la función setPixel().
+
+\subsection{Cálculo de Coordenadas}
+
+Las funciones implementadas utilizan arreglos discretizados previamente calculados.
+
+\subsubsection{Función Seno}
+
+La onda seno se representa mediante el arreglo:
+
+\begin{verbatim}
+unsigned char sin[] =
+{8,9,10,11,11,10,9,8,
+ 7,6,5,4,4,5,6,7};
+\end{verbatim}
+
+Cada valor del arreglo representa la coordenada vertical \(y\) correspondiente a cada posición horizontal \(x\).
+
+La representación gráfica se realiza mediante:
+
+\begin{verbatim}
+for(x = 0; x < 16; x++)
+{
+    setPixel(x,sin[x]);
+}
+\end{verbatim}
+
+\subsubsection{Campana Gaussiana}
+
+La campana gaussiana utiliza un arreglo discreto de alturas:
+
+\begin{verbatim}
+unsigned char gauss[] =
+{15,14,13,12,10,7,5,4,
+ 4,5,7,10,12,13,14,15};
+\end{verbatim}
+
+Cada elemento representa una coordenada vertical asociada a una posición horizontal de la pantalla.
+
+\subsubsection{Recta y=x}
+
+La recta diagonal se genera mediante desplazamientos binarios:
+
+\begin{verbatim}
+frame[i] = (1 << i);
+\end{verbatim}
+
+Cada fila activa únicamente un bit correspondiente a la diagonal principal.
+
+\subsubsection{Representación Circular}
+
+La representación circular utiliza la ecuación matemática:
+
+\[
+(x-c_x)^2 + (y-c_y)^2 \leq r^2
+\]
+
+El algoritmo recorre todas las coordenadas de la pantalla:
+
+\begin{verbatim}
+for(x = 0; x < 16; x++)
+{
+    for(y = 0; y < 16; y++)
+    {
+\end{verbatim}
+
+Para cada punto se calcula:
+
+\begin{verbatim}
+dx = x - centroX;
+dy = y - centroY;
+\end{verbatim}
+
+Si la condición matemática del círculo se cumple, el píxel correspondiente es activado.
+
+\subsection{Escalamiento}
+
+Debido a las limitaciones de resolución de la pantalla LED, las funciones matemáticas deben adaptarse al rango de 0 a 15 píxeles.
+
+Por esta razón, las funciones utilizadas fueron previamente escaladas y discretizadas para ajustarse al tamaño físico de la matriz LED.
+
+El escalamiento permite representar gráficamente funciones matemáticas dentro de un espacio reducido manteniendo una forma visual reconocible.
+
+\subsection{Actualización Gráfica}
+
+Las coordenadas calculadas se almacenan inicialmente dentro del framebuffer.
+
+Posteriormente, la función de multiplexación transmite la información hacia la pantalla LED mediante los registros de desplazamiento 74HC595.
+
+Este proceso permite representar dinámicamente funciones matemáticas sobre la matriz de 16x16 píxeles.
+
+\section{Implementación Física}
+
+La implementación física del sistema se realizó utilizando un microcontrolador PIC16F877A, registros de desplazamiento 74HC595, drivers ULN2803A y cuatro matrices LED de 8x8 organizadas en una configuración 2x2.
+
+El montaje del circuito fue realizado considerando la correcta distribución de alimentación, señales de control y conexiones entre módulos.
+
+Las matrices LED fueron conectadas para formar una pantalla de 16x16 píxeles capaz de representar funciones matemáticas y figuras geométricas mediante multiplexación dinámica.
+
+Los registros de desplazamiento 74HC595 fueron conectados en cascada para ampliar el número de salidas digitales disponibles y reducir la cantidad de pines utilizados del microcontrolador.
+
+Los drivers ULN2803A fueron utilizados como etapa de potencia para manejar la corriente requerida por las matrices LED.
+
+\subsection{Alimentación}
+
+El sistema fue alimentado mediante una fuente regulada de 5V.
+
+El microcontrolador, los registros de desplazamiento y las matrices LED operan utilizando el mismo nivel lógico de alimentación.
+
+El cristal de cuarzo de 4 MHz junto con capacitores cerámicos de 22pF fueron utilizados para garantizar estabilidad en la frecuencia de operación del microcontrolador.
+
+\subsection{Montaje del Sistema}
+
+El armado físico del sistema incluyó:
+
+\begin{itemize}
+    \item conexión del PIC16F877A,
+    \item conexión de registros 74HC595,
+    \item conexión de drivers ULN2803A,
+    \item conexión de matrices LED,
+    \item instalación de resistencias,
+    \item y conexión de botones pulsadores.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    
+    % --- FILA 1 ---
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Proy1.jpeg}
+        \caption{Paso 1}
+        \label{fig:primera}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{proy2.jpeg}
+        \caption{Paso 2}
+        \label{fig:segunda}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Espacio vertical entre la Fila 1 y la Fila 2
+    
+    % --- FILA 2 ---
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{proy3.jpeg}
+        \caption{Paso 3}
+        \label{fig:tercera}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{proy4.jpeg}
+        \caption{Paso 4}
+        \label{fig:cuarta}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Espacio vertical entre la Fila 2 y la Fila 3
+    
+    % --- FILA 3 ---
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{proy5.jpeg} % Cambia el nombre si es distinto
+        \caption{Paso 5}
+        \label{fig:quinta}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{proy6.jpeg} % Cambia el nombre si es distinto
+        \caption{Paso 6}
+        \label{fig:sexta}
+    \end{subfigure}
+
+    \caption{Montaje Físico del Sistema}
+    \label{fig:montaje_fisico}
+\end{figure}
+    
+\subsection{Pruebas de Funcionamiento}
+
+Durante la implementación se realizaron pruebas de funcionamiento para verificar:
+
+\begin{itemize}
+    \item transmisión serial correcta,
+    \item funcionamiento de multiplexación,
+    \item estabilidad visual,
+    \item respuesta de botones,
+    \item y representación gráfica.
+\end{itemize}
+
+Las pruebas permitieron verificar el correcto funcionamiento del sistema y la actualización dinámica de la pantalla LED.
+
+
+\section{Resultados}
+
+El sistema desarrollado logró representar correctamente distintas funciones matemáticas y figuras geométricas sobre la pantalla LED de 16x16 píxeles.
+
+Las pruebas realizadas demostraron el correcto funcionamiento de:
+
+\begin{itemize}
+    \item recta y=x,
+    \item función seno,
+    \item campana gaussiana,
+    \item y representación circular.
+\end{itemize}
+
+La multiplexación implementada permitió obtener una visualización estable y continua sin presencia significativa de parpadeos visibles.
+
+El sistema respondió correctamente a la interacción mediante botones pulsadores, permitiendo seleccionar dinámicamente las diferentes gráficas implementadas en el firmware.
+
+\subsection{Recta y=x}
+
+La representación de la recta diagonal mostró un comportamiento correcto dentro de la matriz LED.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{Boton1_page-0001.jpg}
+\caption{Representación de la recta y=x}
+\end{figure}
+
+\subsection{Función Seno}
+
+La onda seno discretizada fue representada correctamente utilizando coordenadas almacenadas en arreglos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{Boton2_page-0001.jpg}
+\caption{Representación de la función seno}
+\end{figure}
+
+\subsection{Campana Gaussiana}
+
+La campana gaussiana mostró una representación visual adecuada considerando la resolución de la pantalla.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{Boton3_page-0001.jpg}
+\caption{Representación de campana gaussiana}
+\end{figure}
+
+\subsection{Representación Circular}
+
+La función circular logró representar correctamente la ecuación geométrica implementada en el firmware.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{Boton4_page-0001.jpg}
+\caption{Representación circular}
+\end{figure}
+
+Las pruebas realizadas confirmaron el correcto funcionamiento de la comunicación serial, multiplexación y algoritmos de graficación implementados en el sistema.
+
+\section{Conclusiones}
+
+El desarrollo de esta graficadora digital permitió consolidar los conocimientos teóricos y prácticos sobre la arquitectura del microcontrolador PIC16F877A y la programación de sistemas embebidos. Se logró cumplir el objetivo principal de controlar una pantalla LED de 16x16 píxeles mediante la técnica de multiplexación y el uso de registros de desplazamiento 74HC595, demostrando que es posible expandir significativamente los puertos de salida de un microcontrolador utilizando tan solo tres pines de control y aplicando el concepto de bit-banging para la comunicación serial.
+
+Asimismo, la programación modular en lenguaje C resultó fundamental para abstraer la capa de hardware de la lógica matemática. El diseño del algoritmo de discretización y mapeo de coordenadas comprobó que, a pesar de las limitaciones de resolución física, es posible representar funciones matemáticas como la onda seno, distribuciones estadísticas (campana de Gauss) y ecuaciones geométricas (círculo) de manera fluida y visualmente comprensible. 
+
+Finalmente, la integración de etapas de potencia mediante los drivers ULN2803A y la solución de problemas técnicos como el "efecto fantasma" y los rebotes mecánicos, reforzaron la importancia de considerar tanto las limitaciones de corriente del hardware como los tiempos de ejecución del software en el diseño de interfaces humano-máquina.
+
+\section{Referencias}
+
+\begin{itemize}
+
+\item Matriz LED 8x8:
+
+\url{https://s20f2fdae3465e2c6.jimcontent.com/download/version/1626723279/module/13553062729/name/matriz8x8anodocatodo3MM.pdf}
+
+\item ULN2803A:
+
+\url{https://www.futurlec.com/Linear/ULN2803A.shtml}
+
+\item 74HC595 Datasheet:
+
+\url{https://cdn.sparkfun.com/assets/c/b/b/0/0/SN74HC595.pdf}
+
+\end{itemize}
