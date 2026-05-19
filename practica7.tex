@@ -1,1 +1,169 @@
+\section*{\textbf{PRÁCTICA 11: Encender dos motores usando Array de transistores ULN2803}}
+\textbf{11.1: Introducción}
 
+Se desarrolló un sistema embebido utilizando el microcontrolador PIC16F877A para coordinar la tracción y las señales luminosas de un prototipo robótico móvil. El código se estructuró de forma modular en lenguaje C (entorno XC8), separando las funciones de configuración de periféricos de las de control de movimiento. Físicamente, el Puerto B se destinó a la etapa de potencia de los motores y el Puerto C a la gestión de las luces vehiculares (direccionales, frenos y faros). El sistema ejecutó una rutina secuencial basada en retardos de tiempo que simuló la operación de un automóvil: encendido inicial, destellos de advertencia y detención total sincronizada con la luz de freno. El proyecto integró eficazmente hardware y software, fortaleciendo el dominio sobre registros de configuración y temporización digital. \\\
+
+\textbf{11.2: Lista de materiales}
+\begin{itemize}
+    \item 1 Protoboard
+    \item 2 Capacitores 22pF
+    \item 1 Crystal de cuarzo 4 MHz
+    \item 1 PIC16F877A
+    \item 2 Motores reductores tipo I, 3 vcc
+    \item 4 Resistencias de 220 $\Omega$
+    \item 1 Resistencia de 1k
+    \item 1 Push Button
+    \item Cables/Jumpers
+    \item Pickit 3
+
+\end{itemize}
+\textbf{11.3: Software}
+\begin{itemize}
+    \item MPLAB X IDE v6.25
+    \item Pickit 3 v3.10
+    \item Proteus 8
+\end{itemize}
+\textbf{11.4: Desarrollo}
+
+El programa desarrollado gestiona la lógica de control de un prototipo robótico móvil, vinculando de forma síncrona los sistemas de tracción y de señalización óptica. La distribución del hardware se divide en dos bloques principales: el Puerto B administra la etapa de potencia de los motores (mediante un puente H), mientras que el Puerto C controla los indicadores visuales, tales como luces frontales, intermitentes y luces de freno. El flujo de operación es secuencial y consta de tres fases controladas por temporización de software: inicio de marcha con luces de navegación activas, emisión de alertas preventivas intermitentes y, finalmente, un paro total coordinado donde la detención de los motores coincide con el encendido de las luces de freno. Esta implementación evidencia cómo el diseño modular simplifica el desarrollo, aislando la configuración física de los pines de la lógica del comportamiento global. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{proteus.jpg}
+    \caption{Figura: Diagrama en Proteus}
+\end{figure}
+\textbf{11.4.1: Código en C:}
+
+\begin{lstlisting}[language=C]
+#include <xc.h>
+// CONFIG 
+#pragma config FOSC = XT
+#pragma config WDTE = OFF
+#pragma config PWRTE = OFF
+#pragma config BOREN = ON
+#pragma config LVP = OFF
+#pragma config CPD = OFF
+#pragma config WRT = OFF
+#pragma config CP = OFF
+
+#define _XTAL_FREQ 4000000
+
+void confi();
+void motoresAdelante();
+void motoresApagados();
+void farosON();
+void farosOFF();
+void stopsON();
+void stopsOFF();
+void intermitentesParpadeo(unsigned char veces);
+
+
+void main(void) {
+    confi();
+     // Encender faros delanteros
+    farosOFF();
+// Encender luces y motores
+    farosON();
+    motoresAdelante();
+    __delay_ms(1500);
+    // Intermitentes parpadeando 3 veces
+    intermitentesParpadeo(3);
+   
+    farosOFF();
+
+    // Frenado: apagar motores y encender stops
+    motoresApagados();
+    stopsON();
+    __delay_ms(2000);
+
+    // Apagar stops
+    stopsOFF();
+    __delay_ms(1000);
+    return;
+}
+
+void confi() {
+ADCON1 = 0x06;    
+// Todos los puertos como digitales ADCON1 = 0x06;
+
+// Puerto B y C como salidas
+TRISB = 0x00;
+TRISC = 0x00;
+
+// Inicialmente todo apagado
+PORTB = 0x00;
+PORTC = 0x00;
+
+}
+
+void motoresAdelante() {
+    RB0 = 1; RB1 = 1; RB6 = 1; RB7 = 1;
+}
+
+void motoresApagados() {
+    RB0 = 0; RB1 = 0; RB6 = 0; RB7 = 0;
+}
+
+void farosON() {
+    RC0 = 1;
+}
+
+void farosOFF() {
+    RC0 = 0;
+}
+
+void stopsON() {
+    RC2 = 1;
+}
+
+void stopsOFF() {
+    RC2 = 0;
+}
+
+void intermitentesParpadeo(unsigned char veces) {
+    unsigned char i;
+
+for(i = 0; i < veces; i++)
+{
+    RC1 = 1;
+    __delay_ms(500);
+
+    RC1 = 0;
+    __delay_ms(500);
+}
+
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{proteus1.jpg}
+    \caption{Diagrama en Proteus en ejecución}
+\end{figure}
+
+\textbf{11.4.2: Realización de la práctica}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{1.jpeg}
+        \caption{Armado de componentes}
+        \label{fig:primera}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{2.jpeg}
+        \caption{Ejecución de Práctica}
+        \label{fig:segunda}
+    \end{subfigure}
+    
+    % Caption general de todo el bloque de figuras
+    \vspace{10pt} % Añade un pequeño espacio vertical antes del título general
+    \caption{Proceso completo del armado y ejecución de la práctica.}
+    \label{fig:general}
+\end{figure}
+
+\textbf{11.4.3: Conclusiones}
+
+En esta práctica se validó con éxito el desempeño de un sistema de control lógico en un prototipo robótico móvil basado en el microcontrolador PIC16F877A, consiguiendo una sincronización precisa entre el desplazamiento y los indicadores luminosos. Mediante rutinas temporizadas, se recrearon funciones automotrices esenciales, tales como las luces de navegación, las intermitentes de advertencia y las luces de freno integradas al detener el vehículo. Por otra parte, el enfoque de programación modular optimizó la estructura del código al independizar la configuración de los periféricos de la lógica principal. Este ejercicio consolidó el aprendizaje en el manejo de puertos digitales, el acoplamiento de actuadores con microcontroladores y la arquitectura de sistemas embebidos aplicados al sector automotor y la robótica, evidenciando el valor de unificar las respuestas mecánicas y visuales en el diseño de tecnologías eficientes. 
