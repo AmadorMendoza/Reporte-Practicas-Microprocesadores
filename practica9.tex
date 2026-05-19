@@ -1,1 +1,140 @@
+% =========================================================================
+% PRÁCTICA 9: CONTROLADOR DE MATRIZ DE LEDS 8x8
+% =========================================================================
+\section{Práctica 9: Controlador de Matriz de LEDs 8x8}
 
+\subsection{Descripción General}
+Este desarrollo se centró en el diseño y programación de una interfaz visual dinámica mediante una matriz de diodos emisores de luz organizada en un arreglo ortogonal de $8\times8$[cite: 44]. Con la finalidad de superar las restricciones de pines físicas inherentes al encapsulado del microcontrolador, se implementó un algoritmo basado en la técnica de multiplexación por barrido secuencial de filas[cite: 44, 51]. La persistencia de visión del ojo humano unifica las ráfagas discretas de encendido configuradas a $2\text{ ms}$, proyectando figuras complejas e interactivas sin parpadeos perceptibles[cite: 47, 51].
+
+\subsection{Componentes Utilizados}
+\begin{itemize}
+    \item \textbf{Unidad Central:} 1 Microcontrolador PIC16F877A, 1 Módulo programador PICkit 3[cite: 48, 49].
+    \item \textbf{Unidad de Visualización:} 1 Matriz de LEDs común de $8\times8$[cite: 48].
+    \item \textbf{Generador de Reloj:} 1 Cristal de cuarzo de $4\text{ MHz}$, 2 Capacitores de $22\text{ pF}$[cite: 48].
+    \item \textbf{Interfaz de Entrada:} 1 Interruptor codificador múltiple (\textit{DIP Switch})[cite: 47].
+    \item \textbf{Red Estabilizadora:} 4 Resistencias de $220\ \Omega$, 1 Resistencia de $1\text{ k}\Omega$, 1 Pulsador[cite: 48].
+    \item \textbf{Interconexión:} Placa de pruebas (\textit{Protoboard}) y Jumpers de conexión rápida[cite: 48].
+\end{itemize}
+
+\subsection{Entorno de Desarrollo Software}
+\begin{itemize}
+    \item \textbf{IDE:} MPLAB X IDE v6.25[cite: 50].
+    \item \textbf{Compilador:} MPLAB XC8 (Compiler Toolchain)[cite: 46].
+    \item \textbf{Simulación Electrónica:} Proteus VSM 8[cite: 50].
+\end{itemize}
+
+\subsection{Principios de Operación y Control}
+La lógica del sistema explota el almacenamiento de mapas de bits indexados en arreglos globales unidimensionales de tipo \texttt{char}[cite: 48, 52]. El Puerto D actúa de forma síncrona como el bus selector de filas (operando en cátodo común, activas en nivel bajo), mientras que el Puerto B es el encargado de inyectar los datos lógicos en las columnas (ánodos, activos en nivel alto)[cite: 47, 51].
+
+El ciclo de refresco (\textit{refresh rate}) es ejecutado de forma continua por la rutina \texttt{renderizar\_matriz()}[cite: 53]. Esta rutina recorre mediante un bucle indexado las ocho filas, desplazando un cero lógico (\texttt{\~{}(1 << i)}) para habilitar selectivamente una línea a la vez mientras escribe la palabra binaria homóloga guardada en el búfer[cite: 65, 66]. Para evitar falsos disparos por ruido electromecánico en los interruptores del Puerto A, se diseñó una función de lectura con doble verificación temporal (\textit{debounce} por software)[cite: 70].
+
+\subsection{Código de Control en C}
+\begin{lstlisting}[language=C, caption={Firmware para el control multiplexado de la matriz 8x8}, label={code:practica9}]
+#pragma config FOSC = XT       // Reloj oscilador por cristal de cuarzo
+#pragma config WDTE = OFF      // Deshabilitacion del temporizador perro guardian
+#pragma config PWRTE = ON      // Retraso temporizado al encender
+#pragma config BOREN = ON      // Monitoreo de caida de tension activo
+#pragma config LVP = OFF       // Programacion de bajo voltaje inhabilitada
+#pragma config CPD = OFF       // Sin proteccion de lectura en EEPROM
+#pragma config CP = OFF        // Sin proteccion de lectura en codigo
+
+#define _XTAL_FREQ 4000000     // Frecuencia base de 4MHz
+
+#include <xc.h>
+
+// Declaracion de prototipos funcionales
+void inicializar_sistema(void);
+void renderizar_matriz(void);
+unsigned char capturar_entrada(void);
+
+// Iconografia cargada en matrices de datos estaticos
+void cargar_vacio(void);
+void cargar_creeper(void);
+void cargar_corazon(void);
+void cargar_simbolo(void);
+void cargar_personalizado(void);
+void cargar_test(void);
+
+// Buffer dinamico de visualizacion
+unsigned char buffer_grafico[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+void main(void) {
+    unsigned char token_seleccion;
+    inicializar_sistema();
+    
+    while(1) {
+        token_seleccion = capturar_entrada(); // Captura de estados en DIP switch
+        
+        switch(token_seleccion) {
+            case 0: cargar_vacio();         break; // Binario 000
+            case 1: cargar_creeper();       break; // Binario 001
+            case 2: cargar_corazon();       break; // Binario 010
+            case 3: cargar_simbolo();       break; // Binario 011
+            case 4: cargar_personalizado(); break; // Binario 100
+            case 7: cargar_test();          break; // Binario 111
+            default: cargar_personalizado(); break;
+        }
+        
+        renderizar_matriz(); // Proyeccion multiplexada continua
+    }
+}
+
+void inicializar_sistema(void) {
+    ADCON1 = 0x06;  // Desconexion del bloque analogico, Puerto A digital
+    TRISA  = 0xFF;  // Puerto A integro mapeado como lineas de entrada
+    TRISB  = 0x00;  // Puerto B mapeado como bus de salida (Anodos de columna)
+    TRISD  = 0x00;  // Puerto D mapeado como bus de salida (Catodos de fila)
+    PORTB  = 0x00;  // Limpieza inicial de columnas
+    PORTD  = 0xFF;  // Lineas de fila desactivadas (1 logico apaga el catodo)
+}
+
+void renderizar_matriz(void) {
+    for(char i = 0; i < 8; i++) {
+        PORTD = (unsigned char)~(1 << i); // Inyeccion del cero secuencial en filas
+        PORTB = buffer_grafico[i];         // Transmision del patron de columnas
+        __delay_ms(2);                     // Ventana temporal critica de persistencia
+    }
+}
+
+unsigned char capturar_entrada(void) {
+    unsigned char lectura_Alfa, lectura_Beta;
+    do {
+        lectura_Alfa = PORTA & 0x07; // Filtrado de las 3 lineas bajas del puerto
+        __delay_ms(10);
+        lectura_Beta = PORTA & 0x07;
+    } while(lectura_Alfa != lectura_Beta); // Validacion de estabilidad estructural
+    
+    return lectura_Alfa;
+}
+
+void cargar_creeper(void) {
+    unsigned char mapa[8] = {0x00, 0x00, 0x66, 0x66, 0x18, 0x3C, 0x3C, 0x24};
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = mapa[i];
+}
+
+void cargar_vacio(void) {
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = 0x00;
+}
+
+void cargar_corazon(void) {
+    unsigned char mapa[8] = {0x00, 0x66, 0xFF, 0xFF, 0x7E, 0x3C, 0x18, 0x00};
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = mapa[i];
+}
+
+void cargar_simbolo(void) {
+    unsigned char mapa[8] = {0x18, 0x3C, 0x7E, 0xDB, 0x99, 0x18, 0x18, 0x18};
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = mapa[i];
+}
+
+void cargar_personalizado(void) {
+    unsigned char mapa[8] = {0xFF, 0x81, 0xBD, 0xA5, 0xA5, 0xBD, 0x81, 0xFF};
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = mapa[i];
+}
+
+void cargar_test(void) {
+    for(char i = 0; i < 8; i++) buffer_grafico[i] = 0xFF;
+}
+\end{lstlisting}
+
+\subsection{Conclusiones}
+La resolución de este proyecto demostró la efectividad de la multiplexación dinámica por software como solución óptima para extender los recursos físicos de entrada y salida del PIC16F877A[cite: 75, 79]. Reducir la demanda de pines lógicos de 64 líneas independientes a únicamente dos puertos estándar optimiza drásticamente la topología del circuito impreso o de prueba[cite: 79]. Adicionalmente, se concluye que el control temporal preciso en el refresco secuencial ($2\text{ ms}$) es el pilar del diseño, dado que una ventana mayor induciría parpadeos indeseados, rompiendo la persistencia de visión necesaria en la interfaz[cite: 78, 79].
